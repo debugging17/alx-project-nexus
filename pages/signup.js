@@ -17,37 +17,32 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative h-screen grid grid-cols-12 items-start pt-20 md:pt-24 pb-0 px-4 md:px-8 overflow-hidden rounded-tl-[60px] rounded-bl-[60px]">
+    <div className="relative h-screen items-start pt-10 md:pt-14 pb-6 px-4 md:px-8 overflow-x-hidden overflow-y-auto bg-[url('/img/illus2.png')] bg-cover bg-center">
 
-      {/* Left Section - illustration (reference-style placeholder) */}
-      <div className="hidden md:block col-span-7 relative z-10 h-full rounded-tl-[60px] rounded-bl-[60px] overflow-hidden">
-        <div className="w-full h-full bg-gradient-to-br from-slate-200/60 via-slate-300/50 to-slate-400/60 backdrop-blur-sm">
-          <div className="absolute inset-0 grid place-items-center">
-            <span className="text-slate-700/80 text-sm bg-white/70 rounded-lg px-4 py-2 ring-1 ring-white/40 shadow-sm">
-              Signup illustration
-            </span>
-          </div>
+      {/* Global top-right logo pill */}
+      <div className="absolute top-10 right-2 md:top-14 md:right-4 z-50">
+        <div className="inline-flex items-center justify-center h-14 md:h-16 pl-3 pr-5 rounded-r-2xl rounded-l-none bg-white/10 md:bg-white/5 backdrop-blur-3xl shadow-none ring-0">
+          <img src="/img/logo.svg" alt="App logo" className="h-10 md:h-12 w-auto object-contain" />
         </div>
       </div>
 
-      {/* Right Section - Sign Up Form */}
-      <div className="col-span-12 md:col-span-5 w-full mt-10 md:mt-8 lg:mt-6 xl:mt-4 pr-2 md:pr-0 relative z-20">
-        <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 rounded-3xl p-5 md:p-7 relative ring-1 ring-white/30">
-          {/* Overlapping logo pill (top-right of card) */}
-          <div className="absolute -top-6 right-4 md:-top-6 md:right-6 z-40 pointer-events-none">
-            <div className="inline-flex items-center justify-center h-16 md:h-20 px-5 rounded-2xl bg-white/70 backdrop-blur-sm shadow-sm ring-1 ring-white/20">
-              <img src="/img/logo.svg" alt="App logo" className="h-14 md:h-16 w-auto object-contain" />
-            </div>
-          </div>
+      {/* Subtle overlay to soften background image */}
+      <div className="absolute inset-0 bg-white/60 md:bg-white/55 backdrop-blur-[2px] z-10 pointer-events-none" />
+
+      {/* Full-width background illustration applied to wrapper; no separate panel needed */}
+
+      {/* Centered Sign Up Card over background */}
+      <div className="w-full max-w-[860px] xl:max-w-[940px] mx-auto mt-0 relative z-20 -translate-x-4 md:-translate-x-6">
+        <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 rounded-3xl p-5 md:p-6 relative ring-1 ring-white/30 shadow-xl">
           {/* Blur Overlay */}
           <div className="absolute inset-0 m-4 bg-white/10 border border-white/20 backdrop-blur-[3px] rounded-xl" />
 
           {/* Form Content */}
           <div className="relative z-10 pb-1">
-            <h1 className="text-3xl md:text-4xl text-white font-semibold">Sign up</h1>
+            <h1 className="text-3xl md:text-[1.9rem] text-white font-semibold">Sign up</h1>
             <p className="mt-2 text-white/80 text-sm md:text-base">Let's get you all set up so you can access your personal account.</p>
 
-            <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-3">
               {/* Name row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
@@ -77,7 +72,7 @@ export default function Signup() {
               </div>
 
               {/* Contact row */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="email" className="block text-sm text-white/90 mb-1">Email</label>
                   <input
@@ -119,25 +114,44 @@ export default function Signup() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 p-2 rounded-md"
                   >
-                    {showPassword ? 'Hide' : 'Show'}
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M12 5c-5 0-9 4-10 7 1 3 5 7 10 7s9-4 10-7c-1-3-5-7-10-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-2.5A2.5 2.5 0 1 0 12 9a2.5 2.5 0 0 0 0 5Z"/></svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M2.1 3.51 3.5 2.1l18.4 18.4-1.41 1.41-3.23-3.23A11.9 11.9 0 0 1 12 19c-5 0-9-4-10-7a14 14 0 0 1 4.36-5.58L2.1 3.5Zm6.9 6.9a3 3 0 0 0 4.59 3.82l-4.6-4.6Zm3-4.91c5 0 9 4 10 7a14 14 0 0 1-3.38 4.65l-1.45-1.45A11.9 11.9 0 0 0 21 12c-1-3-5-7-10-7-1.1 0-2.15.2-3.12.56l-1.5-1.5A13.9 13.9 0 0 1 12 5.5Z"/></svg>
+                    )}
                   </button>
                 </div>
               </div>
 
               <div>
                 <label htmlFor="confirm" className="block text-sm text-white/90 mb-1">Confirm password</label>
-                <input
-                  id="confirm"
-                  type={showPassword ? 'text' : 'password'}
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  required
-                  minLength={8}
-                  placeholder="••••••••"
-                  className="w-full rounded-lg px-4 py-3 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500"
-                />
+                <div className="relative">
+                  <input
+                    id="confirm"
+                    type={showPassword ? 'text' : 'password'}
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    required
+                    minLength={8}
+                    placeholder="••••••••"
+                    className="w-full rounded-lg px-4 py-2.5 pr-12 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 p-2 rounded-md"
+                  >
+                    {showPassword ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M12 5c-5 0-9 4-10 7 1 3 5 7 10 7s9-4 10-7c-1-3-5-7-10-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-2.5A2.5 2.5 0 1 0 12 9a2.5 2.5 0 0 0 0 5Z"/></svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5"><path fill="currentColor" d="M2.1 3.51 3.5 2.1l18.4 18.4-1.41 1.41-3.23-3.23A11.9 11.9 0 0 1 12 19c-5 0-9-4-10-7a14 14 0 0 1 4.36-5.58L2.1 3.5Zm6.9 6.9a3 3 0 0 0 4.59 3.82l-4.6-4.6Zm3-4.91c5 0 9 4 10 7a14 14 0 0 1-3.38 4.65l-1.45-1.45A11.9 11.9 0 0 0 21 12c-1-3-5-7-10-7-1.1 0-2.15.2-3.12.56l-1.5-1.5A13.9 13.9 0 0 1 12 5.5Z"/></svg>
+                    )}
+                  </button>
+                </div>
               </div>
 
               {/* Terms agreement */}
