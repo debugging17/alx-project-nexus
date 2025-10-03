@@ -25,7 +25,10 @@
   "dependencies": {
     "next": "^15.5.4",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "@apollo/client": "^3.10.8",
+    "graphql": "^16.9.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
@@ -33,3 +36,4 @@
     "tailwindcss": "^3.3.3"
   }
 }
+

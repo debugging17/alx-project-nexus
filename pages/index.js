@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [email, setEmail] = useState('');
@@ -33,7 +34,7 @@ export default function Home() {
           <div className="relative z-10">
             <h1 className="text-4xl text-white font-semibold">Login</h1>
             <p className="mt-3 text-white/80 text-base">
-              Login to access your travelwise account
+              Login to access your Abɔnten account
             </p>
 
             <form onSubmit={handleSubmit} className="mt-8 space-y-5">
@@ -98,6 +99,12 @@ export default function Home() {
               >
                 Sign in
               </button>
+              <p className="mt-4 text-center text-white/90">
+                Don’t have an account?{' '}
+                <Link href="/signup" className="underline underline-offset-2 hover:text-white">
+                  Sign up
+                </Link>
+              </p>
 
               {/* Social login divider */}
               <div className="mt-8">
@@ -123,25 +130,22 @@ export default function Home() {
                       <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.091 3.077-3.394 5.487-6.201 6.771.003-.001.006-.003.009-.004l6.084 5.147C33.03 40.954 38.926 38 43 32c1.259-2.058 2-4.609 2-7.5 0-1.341-.138-2.65-.389-3.917z"/>
                     </svg>
                   </button>
-
                   {/* Apple */}
                   <button type="button" aria-label="Continue with Apple" className="group w-full border-2 border-white rounded-xl py-4 bg-white/0 hover:bg-white/10 transition inline-flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-6 w-6 fill-white/90 group-hover:fill-white"><path d="M16.365 1.43c0 1.14-.422 2.058-1.265 2.753-.843.69-1.785 1.087-2.83 1.183-.12-1.127.333-2.08 1.36-2.857.64-.486 1.39-.751 2.251-.792.197.015.34.035.427.06.04.12.057.27.057.45zm3.403 16.55c-.346.8-.756 1.52-1.228 2.157-.64.86-1.164 1.454-1.57 1.78-.627.58-1.3.878-2.018.897-.513 0-1.133-.147-1.86-.44-.729-.292-1.4-.44-2.015-.44-.64 0-1.327.148-2.062.44-.736.293-1.33.448-1.783.47-.68.03-1.366-.275-2.06-.92-.44-.4-.974-1.02-1.6-1.86-.686-.92-1.25-1.987-1.69-3.203-.473-1.3-.71-2.552-.71-3.76 0-1.39.3-2.59.898-3.6.47-.8 1.095-1.432 1.875-1.897.78-.47 1.624-.71 2.533-.73.497 0 1.15.17 1.958.51.806.34 1.326.51 1.56.51.18 0 .73-.2 1.65-.6.88-.36 1.623-.51 2.227-.45 1.646.132 2.884.777 3.71 1.94-1.47.89-2.197 2.14-2.18 3.757.02 1.252.47 2.291 1.345 3.115.4.38.88.676 1.437.89-.115.33-.237.65-.366.96z"/></svg>
                   </button>
                 </div>
               </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Right Section - illustration (tucked under card) */}
-      <div className="flex-1 hidden md:block -ml-6 md:-ml-10 relative z-10 h-full -mt-20 md:-mt-24 h-[calc(100%+5rem)] md:h-[calc(100%+6rem)] rounded-tl-[60px] rounded-bl-[60px] overflow-hidden">
-        <img
-          src="/img/login.svg"
-          alt="Login illustration"
-          className="w-full h-full object-cover"
-        />
+        <div className="flex-1 hidden md:block -ml-6 md:-ml-10 relative z-10 h-full -mt-20 md:-mt-24 h-[calc(100%+5rem)] md:h-[calc(100%+6rem)] rounded-tl-[60px] rounded-bl-[60px] overflow-hidden">
+          <img
+            src="/img/llus1.png"
+            alt="Login illustration"
+            className="w-full h-full object-cover object-center"
+          />
       </div>
     </div>
   );
