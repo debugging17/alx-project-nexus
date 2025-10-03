@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import Link from 'next/link';
 
 export default function Signup() {
@@ -9,11 +10,60 @@ export default function Signup() {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Placeholder submit; will be wired to Supabase after reference is provided
-    console.log('Signup attempt:', { firstName, lastName, email, phone });
+    setMessage('');
+    setError('');
+    if (!supabase) {
+      setError('Auth is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then restart the dev server.');
+      return;
+    }
+
+    if (password !== confirm) {
+      setError('Passwords do not match.');
+      return;
+    }
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            first_name: firstName,
+            last_name: lastName,
+            phone,
+          },
+          emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/` : undefined,
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
+
+      if (data?.user && !data.session) {
+        setMessage('Account created. Please check your email to confirm your address.');
+      } else if (data?.session) {
+        setMessage('Signed up and logged in.');
+      } else {
+        setMessage('Sign up initiated.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -165,8 +215,15 @@ export default function Signup() {
                 </span>
               </label>
 
-              <button type="submit" className="w-full bg-[#354BAE] text-white font-semibold py-2.5 md:py-3 rounded-lg hover:bg-[#2f429b] transition">
-                Create account
+              {error && (
+                <div className="text-red-100 bg-red-700/60 border border-red-400/60 rounded-md p-2 text-sm">{error}</div>
+              )}
+              {message && (
+                <div className="text-emerald-100 bg-emerald-700/60 border border-emerald-400/60 rounded-md p-2 text-sm">{message}</div>
+              )}
+
+              <button type="submit" disabled={loading} className="w-full bg-[#354BAE] text-white font-semibold py-2.5 md:py-3 rounded-lg hover:bg-[#2f429b] transition disabled:opacity-60 disabled:cursor-not-allowed">
+                {loading ? 'Creating account…' : 'Create account'}
               </button>
 
               <p className="text-sm text-white/80 text-center">

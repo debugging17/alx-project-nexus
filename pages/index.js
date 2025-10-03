@@ -1,27 +1,60 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
+import { useRouter } from 'next/router';
+import { supabase } from '../lib/supabaseClient';
 import Link from 'next/link';
 
 export default function Home() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { email, rememberMe });
+    setError('');
+    setMessage('');
+    if (!supabase) {
+      setError('Auth is not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY, then restart the dev server.');
+      return;
+    }
+    if (!email || !password) {
+      setError('Email and password are required.');
+      return;
+    }
+    try {
+      setLoading(true);
+      // Note: rememberMe persistence can be customized by creating a separate client with different storage.
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) {
+        setError(signInError.message);
+        return;
+      }
+      if (data?.session) {
+        setMessage('Logged in successfully. Redirecting…');
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 300);
+      } else {
+        setMessage('Check your email to continue.');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="relative h-screen flex items-center pt-20 md:pt-24 overflow-hidden rounded-tl-[60px] rounded-bl-[60px]">
       {/* Top-left logo */}
       <div className="absolute top-6 left-6 z-30">
-        <div className="inline-flex items-center justify-center h-16 md:h-20 px-5 rounded-2xl bg-white/70 backdrop-blur-sm shadow-sm ring-1 ring-white/20">
-          <img
-            src="/img/logo.svg"
-            alt="App logo"
-            className="h-14 md:h-16 w-auto object-contain"
-          />
+        <div className="inline-flex items-center justify-center h-16 md:h-20 px-5 rounded-2xl bg-white/80 backdrop-blur-sm shadow-sm ring-1 ring-white/20">
+          <Image src="/img/logo.svg" alt="App logo" width={64} height={64} priority />
         </div>
       </div>
       {/* Left Section - Interactive Login Form */}
@@ -93,11 +126,19 @@ export default function Home() {
                 </a>
               </div>
 
+              {error && (
+                <div className="text-red-100 bg-red-700/60 border border-red-400/60 rounded-md p-2 text-sm">{error}</div>
+              )}
+              {message && (
+                <div className="text-emerald-100 bg-emerald-700/60 border border-emerald-400/60 rounded-md p-2 text-sm">{message}</div>
+              )}
+
               <button
                 type="submit"
-                className="w-full bg-[#354BAE] text-white font-semibold py-3 rounded-lg hover:bg-[#2f429b] transition"
+                disabled={loading}
+                className="w-full bg-[#354BAE] text-white font-semibold py-3 rounded-lg hover:bg-[#2f429b] transition disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Sign in
+                {loading ? 'Signing in…' : 'Sign in'}
               </button>
               <p className="mt-4 text-center text-white/90">
                 Don’t have an account?{' '}
