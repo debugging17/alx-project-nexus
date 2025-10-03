@@ -17,22 +17,22 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative h-screen items-start pt-10 md:pt-14 pb-6 px-4 md:px-8 overflow-x-hidden overflow-y-auto bg-[url('/img/illus2.png')] bg-cover bg-center">
+    <div className="relative h-screen items-start pt-10 md:pt-14 pb-0 px-4 md:px-8 overflow-hidden bg-[url('/img/illus2.png')] bg-cover bg-center" style={{ backgroundSize: '120% 120%', backgroundPosition: '40% 40%' }}>
 
       {/* Global top-right logo pill */}
       <div className="absolute top-10 right-2 md:top-14 md:right-4 z-50">
-        <div className="inline-flex items-center justify-center h-14 md:h-16 pl-3 pr-5 rounded-r-2xl rounded-l-none bg-white/10 md:bg-white/5 backdrop-blur-3xl shadow-none ring-0">
-          <img src="/img/logo.svg" alt="App logo" className="h-10 md:h-12 w-auto object-contain" />
+        <div className="inline-flex items-center justify-center h-16 md:h-20 px-0 bg-transparent backdrop-blur-0 shadow-none ring-0 rounded-none drop-shadow-md">
+          <img src="/img/logo.svg" alt="App logo" className="h-12 md:h-14 w-auto object-contain" />
         </div>
       </div>
 
       {/* Subtle overlay to soften background image */}
-      <div className="absolute inset-0 bg-white/60 md:bg-white/55 backdrop-blur-[2px] z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-white/70 md:bg-white/65 backdrop-blur-[2.5px] z-10 pointer-events-none" />
 
       {/* Full-width background illustration applied to wrapper; no separate panel needed */}
 
       {/* Centered Sign Up Card over background */}
-      <div className="w-full max-w-[860px] xl:max-w-[940px] mx-auto mt-0 relative z-20 -translate-x-4 md:-translate-x-6">
+      <div className="w-full max-w-[860px] mx-auto mt-0 relative z-20 -translate-x-4 md:-translate-x-6">
         <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 rounded-3xl p-5 md:p-6 relative ring-1 ring-white/30 shadow-xl">
           {/* Blur Overlay */}
           <div className="absolute inset-0 m-4 bg-white/10 border border-white/20 backdrop-blur-[3px] rounded-xl" />
