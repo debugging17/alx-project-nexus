@@ -71,13 +71,16 @@ export default function Signup() {
 
       {/* Global top-right logo pill */}
       <div className="absolute top-10 right-2 md:top-14 md:right-4 z-50">
-        <div className="inline-flex items-center justify-center h-16 md:h-20 px-0 bg-transparent backdrop-blur-0 shadow-none ring-0 rounded-none drop-shadow-md">
-          <img src="/img/logo.svg" alt="App logo" className="h-12 md:h-14 w-auto object-contain" />
+        <div className="inline-flex items-center justify-center h-16 md:h-20 px-0 bg-transparent backdrop-blur-0 shadow-none ring-0 rounded-none">
+          {/* Light mode logo */}
+          <img src="/img/logo.svg" alt="App logo" className="h-12 md:h-14 w-auto object-contain drop-shadow-md block dark:hidden" />
+          {/* Dark mode logo */}
+          <img src="/img/darkmodelogo.svg" alt="App logo dark" className="h-12 md:h-14 w-auto object-contain drop-shadow-md hidden dark:block" />
         </div>
       </div>
 
-      {/* Subtle overlay to soften background image */}
-      <div className="absolute inset-0 bg-white/70 md:bg-white/65 dark:bg-black/40 backdrop-blur-[2.5px] z-10 pointer-events-none transition-colors" />
+      {/* Darker overlay to increase foreground contrast */}
+      <div className="absolute inset-0 bg-white/85 md:bg-white/80 dark:bg-black/60 backdrop-blur-[3px] z-10 pointer-events-none transition-colors" />
 
       {/* Full-width background illustration applied to wrapper; no separate panel needed */}
 
