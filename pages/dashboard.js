@@ -64,29 +64,29 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-semibold text-slate-800">Dashboard</h1>
+          <h1 className="text-2xl font-semibold text-slate-800 dark:text-slate-100">Dashboard</h1>
           <button
             onClick={handleSignOut}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 disabled:opacity-60"
+            className="px-4 py-2 rounded-lg bg-slate-800 text-white hover:bg-slate-900 disabled:opacity-60 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-white"
           >
             {loading ? 'Signing out…' : 'Sign out'}
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 text-red-700 bg-red-100 border border-red-300 rounded p-3 text-sm">{error}</div>
+          <div className="mb-4 text-red-800 bg-red-100 border border-red-300 rounded p-3 text-sm dark:bg-red-900/40 dark:text-red-200 dark:border-red-800/60">{error}</div>
         )}
 
         {loading ? (
-          <p className="text-slate-600">Loading…</p>
+          <p className="text-slate-600 dark:text-slate-300">Loading…</p>
         ) : (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <p className="text-slate-700">Welcome{user?.user_metadata?.first_name ? `, ${user.user_metadata.first_name}` : ''}!</p>
-            <pre className="mt-4 p-3 bg-slate-50 rounded border border-slate-200 text-xs overflow-auto">
+          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:bg-slate-800 dark:border-slate-700">
+            <p className="text-slate-700 dark:text-slate-200">Welcome{user?.user_metadata?.first_name ? `, ${user.user_metadata.first_name}` : ''}!</p>
+            <pre className="mt-4 p-3 bg-slate-50 rounded border border-slate-200 text-xs overflow-auto dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200">
 {JSON.stringify({ id: user?.id, email: user?.email, user_metadata: user?.user_metadata }, null, 2)}
             </pre>
           </div>

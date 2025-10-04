@@ -67,7 +67,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="relative h-screen items-start pt-10 md:pt-14 pb-0 px-4 md:px-8 overflow-hidden bg-[url('/img/illus2.png')] bg-cover bg-center" style={{ backgroundSize: '120% 120%', backgroundPosition: '40% 40%' }}>
+    <div className="relative h-screen items-start pt-10 md:pt-14 pb-0 px-4 md:px-8 overflow-hidden bg-[url('/img/illus2.png')] bg-cover bg-center bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors" style={{ backgroundSize: '120% 120%', backgroundPosition: '40% 40%' }}>
 
       {/* Global top-right logo pill */}
       <div className="absolute top-10 right-2 md:top-14 md:right-4 z-50">
@@ -77,15 +77,15 @@ export default function Signup() {
       </div>
 
       {/* Subtle overlay to soften background image */}
-      <div className="absolute inset-0 bg-white/70 md:bg-white/65 backdrop-blur-[2.5px] z-10 pointer-events-none" />
+      <div className="absolute inset-0 bg-white/70 md:bg-white/65 dark:bg-black/40 backdrop-blur-[2.5px] z-10 pointer-events-none transition-colors" />
 
       {/* Full-width background illustration applied to wrapper; no separate panel needed */}
 
       {/* Centered Sign Up Card over background */}
       <div className="w-full max-w-[860px] mx-auto mt-0 relative z-20 -translate-x-4 md:-translate-x-6">
-        <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 rounded-3xl p-5 md:p-6 relative ring-1 ring-white/30 shadow-xl">
+        <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 dark:from-slate-800/70 dark:to-slate-900/70 rounded-3xl p-5 md:p-6 relative ring-1 ring-white/30 dark:ring-white/10 shadow-xl">
           {/* Blur Overlay */}
-          <div className="absolute inset-0 m-4 bg-white/10 border border-white/20 backdrop-blur-[3px] rounded-xl" />
+          <div className="absolute inset-0 m-4 bg-white/10 dark:bg-white/5 border border-white/20 dark:border-white/10 backdrop-blur-[3px] rounded-xl" />
 
           {/* Form Content */}
           <div className="relative z-10 pb-1">
@@ -104,7 +104,7 @@ export default function Signup() {
                     onChange={(e) => setFirstName(e.target.value)}
                     required
                     placeholder="John"
-                    className="w-full rounded-lg px-4 py-2.5 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500"
+                    className="w-full rounded-lg px-4 py-2.5 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400"
                   />
                 </div>
                 <div>
@@ -159,7 +159,7 @@ export default function Signup() {
                     required
                     minLength={8}
                     placeholder="••••••••"
-                    className="w-full rounded-lg px-4 py-2.5 pr-12 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500"
+                    className="w-full rounded-lg px-4 py-2.5 pr-12 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400"
                   />
                   <button
                     type="button"
@@ -222,13 +222,13 @@ export default function Signup() {
                 <div className="text-emerald-100 bg-emerald-700/60 border border-emerald-400/60 rounded-md p-2 text-sm">{message}</div>
               )}
 
-              <button type="submit" disabled={loading} className="w-full bg-[#354BAE] text-white font-semibold py-2.5 md:py-3 rounded-lg hover:bg-[#2f429b] transition disabled:opacity-60 disabled:cursor-not-allowed">
+              <button type="submit" disabled={loading} className="w-full bg-[#354BAE] text-white font-semibold py-2.5 md:py-3 rounded-lg hover:bg-[#2f429b] transition disabled:opacity-60 disabled:cursor-not-allowed dark:bg-indigo-500 dark:hover:bg-indigo-400">
                 {loading ? 'Creating account…' : 'Create account'}
               </button>
 
               <p className="text-sm text-white/80 text-center">
                 Already have an account?{' '}
-                <Link href="/" className="underline underline-offset-2">Login</Link>
+                <Link href="/" className="underline underline-offset-2 text-white hover:text-white dark:text-indigo-300 hover:dark:text-indigo-200">Login</Link>
               </p>
 
               {/* Social signup */}

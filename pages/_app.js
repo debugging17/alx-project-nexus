@@ -1,14 +1,11 @@
 import '../styles/globals.css';
-import { ApolloProvider } from '@apollo/client';
-import { apolloClient } from '../lib/apolloClient';
+import ThemeToggle from '../components/ThemeToggle';
 
 export default function App({ Component, pageProps }) {
-  if (!apolloClient) {
-    return <Component {...pageProps} />;
-  }
   return (
-    <ApolloProvider client={apolloClient}>
+    <>
+      <ThemeToggle />
       <Component {...pageProps} />
-    </ApolloProvider>
+    </>
   );
 }
