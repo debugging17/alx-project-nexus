@@ -14,5 +14,11 @@
   "node_modules/@supabase/storage-js/dist/module/lib/helpers.js -> @supabase/node-fetch": {
     "id": "node_modules/@supabase/storage-js/dist/module/lib/helpers.js -> @supabase/node-fetch",
     "files": []
+  },
+  "pages/splash.js -> ../components/SplashScreen": {
+    "id": "pages/splash.js -> ../components/SplashScreen",
+    "files": [
+      "static/chunks/_pages-dir-browser_components_SplashScreen_js.js"
+    ]
   }
 }

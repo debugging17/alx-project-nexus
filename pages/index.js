@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { supabase } from '../lib/supabaseClient';
@@ -11,6 +11,22 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const status = window.sessionStorage.getItem('splashShown');
+    if (status !== 'true') {
+      window.sessionStorage.setItem('splashShown', 'pending');
+      router.replace('/splash');
+      return;
+    }
+    setReady(true);
+  }, [router]);
+
+  if (!ready) {
+    return null;
+  }
 
   const handleOAuth = async (provider) => {
     try {
@@ -65,7 +81,7 @@ export default function Home() {
       </div>
 
       {/* Left Section - Login Card (stronger glass, no overlap) */}
-      <div className="w-full max-w-xl ml-8 mt-1 md:mt-0 relative z-20">
+      <div className="w-full max-w-xl ml-4 md:ml-6 lg:ml-8 mt-1 md:mt-0 relative z-20">
         <div className="bg-gradient-to-br from-red-600/70 to-red-950/70 dark:from-slate-800/70 dark:to-slate-900/70 rounded-3xl p-8 md:p-10 relative shadow-2xl ring-1 ring-white/10 dark:ring-white/5">
           <div className="absolute inset-0 m-4 bg-white/20 dark:bg-white/10 border border-white/30 dark:border-white/10 backdrop-blur-md rounded-xl shadow-[inset_0_0_0_1px_rgba(255,255,255,0.25)]" />
 
@@ -168,7 +184,7 @@ export default function Home() {
         </div>
       </div>
       {/* Right-side illustration (full height, flush to right, no overlap) */}
-      <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[62%] z-10 overflow-hidden rounded-tl-[180px] rounded-bl-[60px] dark:rounded-tl-[48px] dark:rounded-bl-[48px]">
+      <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[64%] z-10 overflow-hidden rounded-tl-[180px] rounded-bl-[60px] dark:rounded-tl-[104px] dark:rounded-bl-[48px]">
         {/* Light mode illustration */}
         <img src="/img/llus1.png" alt="Login illustration" className="w-full h-full object-cover object-[60%_45%] block dark:hidden" />
         {/* Dark mode video illustration */}
@@ -185,7 +201,7 @@ export default function Home() {
         {/* Dark edge overlay to counter bleed */}
         <div className="pointer-events-none absolute left-0 inset-y-0 w-4 bg-gradient-to-r from-black/20 to-transparent opacity-25" />
         {/* Ultra-thin white hairline for crisp join */}
-        <div className="absolute left-0 inset-y-0 w-px bg-white rounded-tl-[180px] rounded-bl-[60px]" />
+        <div className="absolute left-0 inset-y-0 w-px bg-white rounded-tl-[180px] rounded-bl-[60px] dark:rounded-tl-[104px] dark:rounded-bl-[48px]" />
       </div>
     </div>
   );
