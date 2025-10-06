@@ -110,8 +110,8 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
 
     const container = mountRef.current;
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#f3f7ff');
-    scene.fog = new THREE.FogExp2(0xdbeafe, 0.08);
+    scene.background = new THREE.Color('#f4f7ff');
+    scene.fog = new THREE.FogExp2(0xdde5ff, 0.08);
 
     const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 100);
     camera.position.set(0, 0, 2.95);
@@ -176,8 +176,8 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
       transparent: true,
       uniforms: {
         uProgress: { value: 0 },
-        uColorA: { value: new THREE.Color('#0ea5e9') },
-        uColorB: { value: new THREE.Color('#f59e0b') },
+        uColorA: { value: new THREE.Color('#354BAE') },
+        uColorB: { value: new THREE.Color('#FF0000') },
         uTexture: { value: gradientTexture },
         uIntensity: { value: 0.85 },
         uAlphaBoost: { value: 0.6 },
@@ -218,8 +218,8 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
     mapGroup.add(africaMesh);
 
     const shellMaterial = new THREE.MeshPhysicalMaterial({
-      color: new THREE.Color('#e0f2fe'),
-      emissive: new THREE.Color('#60a5fa'),
+      color: new THREE.Color('#d6dcf7'),
+      emissive: new THREE.Color('#354BAE'),
       emissiveIntensity: 0.5,
       roughness: 0.35,
       metalness: 0.65,
@@ -261,8 +261,8 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
     const hubGeometry = new THREE.SphereGeometry(0.04, 20, 20);
     const hubMaterial = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      emissive: 0x14b8a6,
-      emissiveIntensity: 1.2,
+      emissive: 0x354bae,
+      emissiveIntensity: 1.1,
       roughness: 0.4,
       metalness: 0.35,
     });
@@ -554,17 +554,17 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
     <div className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-[#f8fafc] text-slate-900">
       <div ref={mountRef} className="absolute inset-0" aria-hidden />
       <div className="absolute inset-0 bg-gradient-to-br from-white via-sky-50/65 to-indigo-50/55" aria-hidden />
-      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-14 px-6 py-14 md:flex-row md:items-start md:justify-between md:py-18 lg:py-20">
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-6 py-10 md:flex-row md:items-start md:justify-between md:py-14 lg:py-16">
         <div className="flex w-full max-w-xl flex-col items-center text-center md:items-start md:text-left">
           <div className="relative w-fit">
             <img
               src="/img/logo.svg"
               alt="Project Nexus logo"
-              className="h-14 w-auto md:h-16 drop-shadow-[0_18px_45px_rgba(99,102,241,0.3)]"
+              className="h-20 w-auto md:h-24 drop-shadow-[0_18px_45px_rgba(99,102,241,0.3)]"
             />
             <div className="absolute inset-x-0 -bottom-5 h-1.5 rounded-full bg-gradient-to-r from-sky-400 via-emerald-300 to-indigo-400 blur-md opacity-80" />
           </div>
-          <div className="mt-10 space-y-5 text-slate-600">
+          <div className="mt-8 space-y-5 text-slate-600">
             <p className="text-xs uppercase tracking-[0.55em] text-sky-500 md:text-sm">Connecting African Creatives</p>
             <SplitText
               text="Discover. Collaborate. Showcase."
@@ -585,7 +585,7 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
               musicians, filmmakers, and storytellers shaping culture across the continent.
             </p>
           </div>
-          <div className="mt-12 flex w-full max-w-md flex-col gap-4 text-xs text-slate-500 md:text-sm">
+          <div className="mt-10 flex w-full max-w-md flex-col gap-4 text-xs text-slate-500 md:text-sm">
             <div className="rounded-lg border border-slate-200/90 bg-slate-100/90 p-4 shadow-[inset_0_1px_3px_rgba(148,163,184,0.4)]">
               <p className="text-xs font-semibold uppercase tracking-[0.35em] text-slate-600 md:text-sm">Loading...</p>
               <div className="mt-3 rounded-sm border border-slate-400 bg-slate-200 p-1 shadow-inner">
@@ -613,7 +613,7 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
           <button
             type="button"
             onClick={handleSkip}
-            className="mt-10 inline-flex items-center rounded-full border border-indigo-200 bg-white px-7 py-2 text-xs font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-50 md:text-sm"
+            className="mt-8 inline-flex items-center rounded-full border border-indigo-200 bg-white px-7 py-2 text-xs font-medium text-indigo-600 transition hover:border-indigo-300 hover:bg-indigo-50 md:text-sm"
           >
             Skip intro
           </button>
