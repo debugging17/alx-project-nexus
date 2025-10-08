@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import * as three from 'three';
+import * as THREE from 'three';
 import SplitText from './SplitText';
 const AFRICA_PATH =
   'M342.6 17.1 316.5 24.6 298.8 29.4 277.1 22.7 261.6 27.5 242.5 62.1 219.9 79.4 210.4 95.7 198.1 117.5 190.3 141.2 192.7 160.5 204.7 181.5 205 204.6 187.6 219 191.7 239.9 179.4 256.5 185.3 270.6 181.6 292.5 192.9 311.7 207 318.2 225.4 333 237.6 347.1 256.2 370.4 274.8 394.2 287.2 40' +
