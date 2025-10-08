@@ -122,17 +122,19 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
 
     const gradientTexture = (() => {
       const size = 128;
-      const data = new Uint8Array(3 * size);
+      const data = new Uint8Array(4 * size);
       for (let i = 0; i < size; i += 1) {
         const ratio = i / (size - 1);
         const r = Math.floor(200 + ratio * 40);
         const g = Math.floor(220 + ratio * 25);
         const b = Math.floor(235 + ratio * 15);
-        data[i * 3] = r;
-        data[i * 3 + 1] = g;
-        data[i * 3 + 2] = b;
+        const baseIndex = i * 4;
+        data[baseIndex] = r;
+        data[baseIndex + 1] = g;
+        data[baseIndex + 2] = b;
+        data[baseIndex + 3] = 255;
       }
-      const texture = new THREE.DataTexture(data, size, 1, THREE.RGBFormat);
+      const texture = new THREE.DataTexture(data, size, 1, THREE.RGBAFormat);
       texture.needsUpdate = true;
       return texture;
     })();
