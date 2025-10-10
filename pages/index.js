@@ -184,9 +184,13 @@ export default function Home() {
         </div>
       </div>
       {/* Right-side illustration (full height, flush to right, no overlap) */}
-      <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[64%] z-10 overflow-hidden rounded-tl-[180px] rounded-bl-[60px] dark:rounded-tl-[104px] dark:rounded-bl-[48px]">
+      <div className="hidden md:block absolute right-0 top-0 bottom-0 w-[64%] z-10 overflow-hidden rounded-tl-[260px] rounded-bl-[64px] dark:rounded-tl-[160px] dark:rounded-bl-[52px]">
         {/* Light mode illustration */}
-        <img src="/img/llus1.png" alt="Login illustration" className="w-full h-full object-cover object-[60%_45%] block dark:hidden" />
+        <img
+          src="/img/llus1.png"
+          alt="Login illustration"
+          className="w-full h-full object-cover object-center scale-[1.18] translate-x-10 md:translate-x-16 lg:translate-x-20 xl:translate-x-24 origin-center block dark:hidden"
+        />
         {/* Dark mode video illustration */}
         <video
           src="/img/darkmodevid.mp4"
@@ -197,11 +201,11 @@ export default function Home() {
           className="w-full h-full object-cover object-center hidden dark:block"
         />
         {/* Softer overlay for better balance; beneath card (z-10) and logo (z-50) */}
-        <div className="absolute inset-0 bg-black/[0.005] dark:bg-black/[0.15] backdrop-blur-0" />
+        <div className="absolute inset-0 bg-black/[0.005] dark:bg-black/[0.15] backdrop-blur-0 rounded-tl-[260px] rounded-bl-[64px] dark:rounded-tl-[160px] dark:rounded-bl-[52px]" />
         {/* Dark edge overlay to counter bleed */}
-        <div className="pointer-events-none absolute left-0 inset-y-0 w-4 bg-gradient-to-r from-black/20 to-transparent opacity-25" />
+        <div className="pointer-events-none absolute left-0 inset-y-0 w-4 bg-gradient-to-r from-black/20 to-transparent opacity-25 rounded-tl-[260px] rounded-bl-[64px] dark:rounded-tl-[160px] dark:rounded-bl-[52px]" />
         {/* Ultra-thin white hairline for crisp join */}
-        <div className="absolute left-0 inset-y-0 w-px bg-white rounded-tl-[180px] rounded-bl-[60px] dark:rounded-tl-[104px] dark:rounded-bl-[48px]" />
+        <div className="absolute left-0 inset-y-0 w-[1.5px] bg-white rounded-tl-[260px] rounded-bl-[64px] dark:rounded-tl-[160px] dark:rounded-bl-[52px]" />
       </div>
     </div>
   );
