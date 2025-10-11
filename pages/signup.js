@@ -71,12 +71,16 @@ export default function Signup() {
 
       {/* Global top-right logo pill */}
       <div className="absolute top-10 right-2 md:top-14 md:right-4 z-50">
-        <div className="inline-flex items-center justify-center h-16 md:h-20 px-0 bg-transparent backdrop-blur-0 shadow-none ring-0 rounded-none">
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center h-16 md:h-20 px-0 bg-transparent backdrop-blur-0 shadow-none ring-0 rounded-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354BAE]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          <span className="sr-only">Go to home</span>
           {/* Light mode logo */}
           <img src="/img/logo.svg" alt="App logo" className="h-12 md:h-14 w-auto object-contain drop-shadow-md block dark:hidden" />
           {/* Dark mode logo */}
           <img src="/img/darkmodelogo.svg" alt="App logo dark" className="h-12 md:h-14 w-auto object-contain drop-shadow-md hidden dark:block" />
-        </div>
+        </Link>
       </div>
 
       {/* Darker overlay to increase foreground contrast */}

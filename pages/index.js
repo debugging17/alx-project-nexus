@@ -72,12 +72,16 @@ export default function Home() {
     <div className="relative min-h-screen flex items-center pt-24 md:pt-28 overflow-hidden rounded-tl-[60px] rounded-bl-[60px] dark:rounded-none bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors">
       {/* Top-left logo block (blended, theme-aware) */}
       <div className="absolute top-10 left-6 z-50">
-        <div className="inline-flex items-center justify-center px-0 py-0 bg-transparent rounded-none shadow-none ring-0">
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center px-0 py-0 bg-transparent rounded-none shadow-none ring-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354BAE]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+        >
+          <span className="sr-only">Go to home</span>
           {/* Light mode logo */}
           <img src="/img/logo.svg" alt="App logo" className="h-20 md:h-24 w-auto object-contain drop-shadow-md block dark:hidden" />
           {/* Dark mode logo */}
           <img src="/img/darkmodelogo.svg" alt="App logo dark" className="h-16 md:h-20 w-auto object-contain drop-shadow-md hidden dark:block" />
-        </div>
+        </Link>
       </div>
 
       {/* Left Section - Login Card (stronger glass, no overlap) */}

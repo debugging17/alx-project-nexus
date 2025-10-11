@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import SplitText from './SplitText';
 
@@ -72,14 +73,18 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
       <div className="relative z-10 flex w-full max-w-[1380px] flex-col items-center gap-12 px-6 py-12 md:flex-row md:items-stretch md:justify-between md:gap-16 md:py-16 md:px-10 lg:gap-20">
         <div className="flex w-full flex-1 flex-col justify-between text-center md:max-w-none md:items-start md:text-left">
           <div className="flex flex-1 flex-col items-center text-center md:items-start md:justify-center md:text-left">
-            <div className="relative w-fit">
+            <Link
+              href="/"
+              className="relative block w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354BAE]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+            >
+              <span className="sr-only">Go to home</span>
               <img
                 src="/img/logo.svg"
                 alt="Project Nexus logo"
                 className="h-20 w-auto drop-shadow-[0_18px_45px_rgba(99,102,241,0.3)] md:h-24"
               />
               <div className="absolute inset-x-0 -bottom-5 h-1.5 rounded-full bg-gradient-to-r from-sky-400 via-emerald-300 to-indigo-400 blur-md opacity-80" />
-            </div>
+            </Link>
 
             <div className="mt-10 max-w-xl space-y-5 text-slate-600">
               <p className="text-xs uppercase tracking-[0.55em] text-[#354BAE] md:text-sm">
