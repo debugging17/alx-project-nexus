@@ -22,15 +22,6 @@ function timeSince(date) {
 }
 
 export default function Dashboard() {
-  const router = useRouter();
-  const [sessionLoading, setSessionLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const [authError, setAuthError] = useState('');
-
-  // Conditionally call queries only if the client is available.
-  const { data: postsData, loading: postsLoading, error: postsError } = apolloClient ? useQuery(GET_POSTS) : { data: null, loading: false, error: null };
-  const { data: usersData, loading: usersLoading, error: usersError } = apolloClient ? useQuery(GET_USERS) : { data: null, loading: false, error: null };
-
   if (!apolloClient) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 text-red-500">
@@ -38,6 +29,18 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  return <DashboardContent />;
+}
+
+function DashboardContent() {
+  const router = useRouter();
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [authError, setAuthError] = useState('');
+
+  const { data: postsData, loading: postsLoading, error: postsError } = useQuery(GET_POSTS);
+  const { data: usersData, loading: usersLoading, error: usersError } = useQuery(GET_USERS);
 
   const posts = postsData?.postsCollection?.edges.map(e => e.node) || [];
   const suggestedUsers = usersData?.usersCollection?.edges.map(e => e.node) || [];
@@ -72,7 +75,10 @@ export default function Dashboard() {
       else setUser(session.user);
     }) ?? { data: { subscription: null } };
 
-    return () => { mounted = false; sub?.subscription?.unsubscribe?.(); };
+    return () => {
+      mounted = false;
+      sub?.subscription?.unsubscribe?.();
+    };
   }, [router]);
 
   const handleSignOut = async () => {
@@ -179,7 +185,9 @@ export default function Dashboard() {
               <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-4">
                 <h3 className="text-sm font-semibold">Today’s News</h3>
                 <ul className="mt-3 space-y-3 text-sm">
-                  {['Item 1', 'Item 2', 'Item 3'].map(item => <li key={item} className="hover:underline cursor-pointer">{item}</li>)}
+                  {['Item 1', 'Item 2', 'Item 3'].map(item => (
+                    <li key={item} className="hover:underline cursor-pointer">{item}</li>
+                  ))}
                 </ul>
               </div>
             </div>

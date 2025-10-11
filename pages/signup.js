@@ -97,7 +97,7 @@ export default function Signup() {
           {/* Form Content */}
           <div className="relative z-10 pb-1">
             <h1 className="text-3xl md:text-[1.9rem] text-white font-semibold">Sign up</h1>
-            <p className="mt-2 text-white/80 text-sm md:text-base">Let's get you all set up so you can access your personal account.</p>
+            <p className="mt-2 text-white/80 text-sm md:text-base">Let&apos;s get you all set up so you can access your personal account.</p>
 
             <form onSubmit={handleSubmit} className="mt-4 space-y-3">
               {/* Name row */}

@@ -164,7 +164,7 @@ export default function Home() {
 
               {/* Sign up link */}
               <p className="text-center text-sm text-white/85">
-                Don't have an account?{' '}
+                Don&apos;t have an account?{' '}
                 <Link href="/signup" className="underline underline-offset-2 text-white hover:text-white dark:text-indigo-300 hover:dark:text-indigo-200">Sign up</Link>
               </p>
 
