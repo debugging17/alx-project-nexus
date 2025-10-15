@@ -239,7 +239,7 @@ function DashboardContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-4 xl:pl-0 xl:pr-24 py-4 md:py-6">
+      <div className="max-w-7xl mx-auto px-3 md:px-6 lg:px-4 xl:pl-0 xl:pr-28 py-4 md:py-6">
         <div className="grid grid-cols-12 gap-4 md:gap-5 lg:gap-5 xl:gap-8">
           {/* Left Nav */}
           <aside className="hidden md:block md:col-span-3 lg:col-span-3 xl:col-span-3">
@@ -372,7 +372,7 @@ function DashboardContent() {
             </div>
           </main>
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
-            <div className="sticky top-4 ml-auto lg:mr-11 xl:mr-20 w-full max-w-sm space-y-4 pr-4 lg:pr-6 xl:pr-8">
+            <div className="sticky top-4 ml-auto lg:mr-12 xl:mr-22 w-full max-w-sm space-y-4 pr-4 lg:pr-6 xl:pr-8">
               <form className="relative flex w-full items-center rounded-full border border-slate-200 bg-white pl-4 pr-12 py-2.5 dark:border-slate-700 dark:bg-slate-800 lg:min-w-[260px] xl:min-w-[280px] lg:mt-2 xl:mt-3">
                 <input
                   type="text"
