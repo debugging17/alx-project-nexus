@@ -33,7 +33,7 @@ export default function ThemeToggle() {
       aria-label="Toggle theme"
       onClick={() => applyTheme(theme === 'dark' ? 'light' : 'dark')}
       className={[
-        'fixed right-4 top-4 z-[60] rounded-full border px-3 py-2 text-sm font-medium shadow-md transition-colors',
+        'fixed right-8 top-4 z-[60] rounded-full border px-3 py-2 text-sm font-medium shadow-md transition-colors',
         theme === 'dark'
           ? 'bg-white text-slate-900 border-white/60 hover:bg-white/95'
           : 'bg-slate-900 text-white border-slate-800 hover:bg-black'

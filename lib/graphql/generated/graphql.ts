@@ -466,6 +466,7 @@ export type Users = Node & {
   __typename?: 'users';
   created_at?: Maybe<Scalars['Datetime']['output']>;
   email?: Maybe<Scalars['String']['output']>;
+  avatar?: Maybe<Scalars['String']['output']>;
   first_name?: Maybe<Scalars['String']['output']>;
   id: Scalars['UUID']['output'];
   last_name?: Maybe<Scalars['String']['output']>;
@@ -523,6 +524,7 @@ export type UsersFilter = {
 export type UsersInsertInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
   first_name?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   last_name?: InputMaybe<Scalars['String']['input']>;
@@ -539,6 +541,7 @@ export type UsersInsertResponse = {
 export type UsersOrderBy = {
   created_at?: InputMaybe<OrderByDirection>;
   email?: InputMaybe<OrderByDirection>;
+  avatar?: InputMaybe<OrderByDirection>;
   first_name?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   last_name?: InputMaybe<OrderByDirection>;
@@ -547,6 +550,7 @@ export type UsersOrderBy = {
 export type UsersUpdateInput = {
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
   first_name?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   last_name?: InputMaybe<Scalars['String']['input']>;
