@@ -48,6 +48,22 @@ function DashboardContent({ initialNewsArticles, newsError }) {
   const [newsLoading, setNewsLoading] = useState(false);
   const [currentNewsError, setCurrentNewsError] = useState(newsError);
   const hasNewsError = Boolean(currentNewsError);
+  
+  // Navigation state
+  const [activeView, setActiveView] = useState('Home');
+  
+  // Post creation modal state
+  const [showComposeModal, setShowComposeModal] = useState(false);
+  const [postContent, setPostContent] = useState('');
+  const [postMedia, setPostMedia] = useState([]);
+  const [drafts, setDrafts] = useState([]);
+  
+  // Post interactions state
+  const [likedPosts, setLikedPosts] = useState(new Set());
+  const [bookmarkedPosts, setBookmarkedPosts] = useState(new Set());
+  const [commentingOn, setCommentingOn] = useState(null);
+
+
   const resolveAvatarLetter = (entity) => {
     if (!entity) return 'U';
     const source = typeof entity === 'string' ? entity : entity.avatar || entity.avatar_letter || entity.avatar_letter_override;
@@ -111,6 +127,368 @@ function DashboardContent({ initialNewsArticles, newsError }) {
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Post interaction handlers
+  const handleLike = (postId) => {
+    setLikedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleBookmark = (postId) => {
+    setBookmarkedPosts(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(postId)) {
+        newSet.delete(postId);
+      } else {
+        newSet.add(postId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleComment = (postId) => {
+    setCommentingOn(commentingOn === postId ? null : postId);
+  };
+
+  const handleShare = (post) => {
+    if (navigator.share) {
+      navigator.share({
+        title: post.content?.substring(0, 50) || 'Check out this post',
+        text: post.content,
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    }
+  };
+
+  // Post creation handlers
+  const handleOpenCompose = () => {
+    setShowComposeModal(true);
+  };
+
+  const handleCloseCompose = () => {
+    if (postContent.trim() || postMedia.length > 0) {
+      if (confirm('Save as draft?')) {
+        handleSaveDraft();
+      }
+    }
+    setShowComposeModal(false);
+    setPostContent('');
+    setPostMedia([]);
+  };
+
+  const handleSaveDraft = () => {
+    const draft = {
+      id: Date.now(),
+      content: postContent,
+      media: postMedia,
+      createdAt: new Date().toISOString()
+    };
+    setDrafts(prev => [...prev, draft]);
+    setPostContent('');
+    setPostMedia([]);
+    setShowComposeModal(false);
+  };
+
+  const handlePost = async () => {
+    if (!postContent.trim() && postMedia.length === 0) return;
+    
+    // Post creation will be implemented with GraphQL mutation
+    // For now, showing success message
+    alert('Post created successfully!');
+    
+    setPostContent('');
+    setPostMedia([]);
+    setShowComposeModal(false);
+  };
+
+  const handleMediaUpload = (e) => {
+    const files = Array.from(e.target.files || []);
+    const mediaUrls = files.map(file => URL.createObjectURL(file));
+    setPostMedia(prev => [...prev, ...mediaUrls]);
+  };
+
+  const handleRemoveMedia = (index) => {
+    setPostMedia(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Render content based on active view
+  const renderViewContent = () => {
+    switch (activeView) {
+      case 'Home':
+        return (
+          <>
+            {/* Compose Section */}
+            <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/90">
+              <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
+                <button type="button" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 transition hover:text-slate-700 dark:hover:text-slate-200">
+                  <span className="inline-flex h-5 w-5 items-center justify-center">
+                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18" />
+                      <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                  </span>
+                  Close
+                </button>
+                <button type="button" className="rounded-full px-4 py-1.5 text-sm text-indigo-600 transition hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-500/10">Drafts</button>
+              </div>
+              <div className="mt-4 flex items-start gap-4">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-500 text-2xl font-semibold text-white shadow-sm aspect-square">
+                  {currentUserAvatarLetter}
+                </div>
+                <textarea
+                  rows={3}
+                  placeholder="What's happening?"
+                  onClick={handleOpenCompose}
+                  readOnly
+                  className="h-24 w-full resize-none bg-transparent text-lg text-slate-700 placeholder:text-slate-400 focus:outline-none cursor-pointer dark:text-slate-100 dark:placeholder:text-slate-500"
+                />
+              </div>
+              <button type="button" className="mt-4 flex items-center gap-2 text-base font-medium text-indigo-600 transition hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
+                <span className="inline-flex h-6 w-6 items-center justify-center">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 21s6-4.686 6-10a6 6 0 1 0-12 0c0 5.314 6 10 6 10z" />
+                    <circle cx="12" cy="11" r="2" />
+                  </svg>
+                </span>
+                Everyone can reply
+              </button>
+              <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div className="flex flex-wrap items-center gap-2 text-indigo-600 dark:text-indigo-300">
+                    {composeActions.map(action => (
+                      <button
+                        key={action.label}
+                        type="button"
+                        className="group relative flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50/60 text-current transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20"
+                        aria-label={action.label}
+                      >
+                        {action.icon}
+                        <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700">
+                          {action.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-end gap-3">
+                    <button className="px-5 py-2.5 rounded-full text-base font-medium text-indigo-600 ring-1 ring-inset ring-indigo-200 transition hover:bg-indigo-50 dark:text-indigo-200 dark:ring-indigo-500/40 dark:hover:bg-indigo-500/10">
+                      Draft
+                    </button>
+                    <button className="px-6 py-2.5 rounded-full text-base font-semibold bg-indigo-600 text-white transition hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400">
+                      Post
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Posts Feed */}
+            <div className="mt-4 space-y-4">
+              {postsLoading && <div className="text-center py-8">Loading posts...</div>}
+              {postsError && <div className="text-center py-8 text-red-500">Error loading posts</div>}
+              {posts.map(post => (
+                <article key={post.id} className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-4">
+                  <div className="flex gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 text-lg font-semibold text-white shadow-sm aspect-square">
+                      {resolveAvatarLetter(post.users)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <p className="text-base font-semibold">{post.users?.first_name || 'User'}</p>
+                        <span className="text-sm text-slate-500 dark:text-slate-400">{timeSince(post.created_at)}</span>
+                      </div>
+                      <p className="mt-2 text-base text-slate-700 dark:text-slate-200">{post.content}</p>
+                      <div className="mt-4 flex items-center gap-7 text-base text-slate-500 dark:text-slate-400">
+                        <button 
+                          onClick={() => handleLike(post.id)}
+                          className={`flex items-center gap-1.5 transition ${likedPosts.has(post.id) ? 'text-red-500' : 'hover:text-red-500'}`}
+                        >
+                          <svg className="h-5 w-5" fill={likedPosts.has(post.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                          </svg>
+                          Like
+                        </button>
+                        <button 
+                          onClick={() => handleComment(post.id)}
+                          className="flex items-center gap-1.5 hover:text-indigo-600 dark:hover:text-indigo-400 transition"
+                        >
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                          Comment
+                        </button>
+                        <button 
+                          onClick={() => handleShare(post)}
+                          className="flex items-center gap-1.5 hover:text-green-600 dark:hover:text-green-400 transition"
+                        >
+                          <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                          </svg>
+                          Share
+                        </button>
+                        <button 
+                          onClick={() => handleBookmark(post.id)}
+                          className={`ml-auto flex items-center gap-1.5 transition ${bookmarkedPosts.has(post.id) ? 'text-yellow-500' : 'hover:text-yellow-500'}`}
+                        >
+                          <svg className="h-5 w-5" fill={bookmarkedPosts.has(post.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                          </svg>
+                        </button>
+                      </div>
+                      {commentingOn === post.id && (
+                        <div className="mt-4 flex gap-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500 text-sm font-semibold text-white">
+                            {currentUserAvatarLetter}
+                          </div>
+                          <div className="flex-1">
+                            <textarea
+                              placeholder="Write a comment..."
+                              rows={2}
+                              className="w-full resize-none rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <div className="mt-2 flex justify-end gap-2">
+                              <button 
+                                onClick={() => setCommentingOn(null)}
+                                className="px-3 py-1.5 text-sm text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200"
+                              >
+                                Cancel
+                              </button>
+                              <button className="px-4 py-1.5 rounded-full text-sm bg-indigo-600 text-white hover:bg-indigo-500">
+                                Comment
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </>
+        );
+
+      case 'Explore':
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-8">
+            <div className="text-center">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-500/20 mb-4">
+                <svg className="h-8 w-8 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="m8 16 2-6 6-2-2 6-6 2z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Explore</h2>
+              <p className="text-slate-600 dark:text-slate-400 mb-6">Discover trending topics and new creators</p>
+              <div className="grid grid-cols-2 gap-4 mt-8">
+                {['#Technology', '#Design', '#Art', '#Music'].map(tag => (
+                  <button key={tag} className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition">
+                    <p className="font-semibold text-indigo-600 dark:text-indigo-400">{tag}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Trending</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'Notifications':
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-8">
+            <div className="text-center">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-500/20 mb-4">
+                <svg className="h-8 w-8 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M18 15a3 3 0 0 0 3-3 6 6 0 1 0-12 0 3 3 0 0 0 3 3" />
+                  <path d="M5 15h14l-1 5H6l-1-5z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Notifications</h2>
+              <p className="text-slate-600 dark:text-slate-400">You&apos;re all caught up!</p>
+              <div className="mt-8 space-y-3">
+                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 text-left">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">New follower</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">John Doe started following you</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">2 hours ago</p>
+                </div>
+                <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-700/50 text-left">
+                  <p className="font-medium text-slate-900 dark:text-slate-100">Post liked</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">Jane Smith liked your post</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-2">5 hours ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'Messages':
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-8">
+            <div className="text-center">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20 mb-4">
+                <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2">Messages</h2>
+              <p className="text-slate-600 dark:text-slate-400">No new messages</p>
+              <button className="mt-6 px-6 py-2.5 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition">
+                Start a conversation
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'Profile':
+        return (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 overflow-hidden">
+              <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+              <div className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex h-24 w-24 -mt-16 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-3xl font-bold text-white shadow-lg border-4 border-white dark:border-slate-800">
+                    {currentUserAvatarLetter}
+                  </div>
+                  <button className="px-4 py-2 rounded-full border border-slate-300 dark:border-slate-600 font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+                    Edit Profile
+                  </button>
+                </div>
+                <div className="mt-4">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{user?.user_metadata?.first_name || 'User'}</h2>
+                  <p className="text-slate-600 dark:text-slate-400">{user?.email}</p>
+                  <p className="mt-3 text-slate-700 dark:text-slate-300">Creative professional passionate about design and technology.</p>
+                  <div className="flex gap-6 mt-4 text-sm">
+                    <div>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">128</span>
+                      <span className="text-slate-600 dark:text-slate-400 ml-1">Following</span>
+                    </div>
+                    <div>
+                      <span className="font-bold text-slate-900 dark:text-slate-100">1.2K</span>
+                      <span className="text-slate-600 dark:text-slate-400 ml-1">Followers</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-6">
+              <h3 className="font-bold text-lg mb-4">Your Posts</h3>
+              <p className="text-slate-600 dark:text-slate-400">Your posts will appear here</p>
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   const navItems = [
     {
@@ -298,8 +676,9 @@ function DashboardContent({ initialNewsArticles, newsError }) {
                       <li key={item.label}>
                         <button
                           type="button"
+                          onClick={() => setActiveView(item.label)}
                           className={`flex w-full items-center gap-3 rounded-2xl px-3 py-3 text-base font-medium transition ${
-                            item.active
+                            activeView === item.label
                               ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-200'
                               : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-700/40 dark:hover:text-white'
                           }`}
@@ -325,90 +704,12 @@ function DashboardContent({ initialNewsArticles, newsError }) {
 
           {/* Center Feed */}
           <main className="col-span-12 md:col-span-9 lg:col-span-6 xl:col-span-7">
-            <section className="rounded-3xl border border-slate-200 bg-white/95 p-6 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-900/90">
-              <div className="flex items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400">
-                <button type="button" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 transition hover:text-slate-700 dark:hover:text-slate-200">
-                  <span className="inline-flex h-5 w-5 items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="18" y1="6" x2="6" y2="18" />
-                      <line x1="6" y1="6" x2="18" y2="18" />
-                    </svg>
-                  </span>
-                  Close
-                </button>
-                <button type="button" className="rounded-full px-4 py-1.5 text-sm text-indigo-600 transition hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-500/10">Drafts</button>
-              </div>
-              <div className="mt-4 flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-amber-500 text-2xl font-semibold text-white shadow-sm aspect-square">
-                  {currentUserAvatarLetter}
-                </div>
-                <textarea
-                  rows={3}
-                  placeholder="What’s happening?"
-                  className="h-24 w-full resize-none bg-transparent text-lg text-slate-700 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-              </div>
-              <button type="button" className="mt-4 flex items-center gap-2 text-base font-medium text-indigo-600 transition hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
-                <span className="inline-flex h-6 w-6 items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 21s6-4.686 6-10a6 6 0 1 0-12 0c0 5.314 6 10 6 10z" />
-                    <circle cx="12" cy="11" r="2" />
-                  </svg>
-                </span>
-                Everyone can reply
-              </button>
-              <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div className="flex flex-wrap items-center gap-2 text-indigo-600 dark:text-indigo-300">
-                    {composeActions.map(action => (
-                      <button
-                        key={action.label}
-                        type="button"
-                        className="group relative flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50/60 text-current transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:hover:bg-indigo-500/20"
-                        aria-label={action.label}
-                      >
-                        {action.icon}
-                        <span className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-md bg-slate-900 px-2 py-1 text-xs font-medium text-white opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:opacity-100 dark:bg-slate-700">
-                          {action.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex items-center justify-end gap-3">
-                    <button className="px-5 py-2.5 rounded-full text-base font-medium text-indigo-600 ring-1 ring-inset ring-indigo-200 transition hover:bg-indigo-50 dark:text-indigo-200 dark:ring-indigo-500/40 dark:hover:bg-indigo-500/10">
-                      Draft
-                    </button>
-                    <button className="px-6 py-2.5 rounded-full text-base font-semibold bg-indigo-600 text-white transition hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400">
-                      Post
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </section>
-            <div className="mt-4 space-y-4">
-              {posts.map(post => (
-                <article key={post.id} className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-4">
-                  <div className="flex gap-4">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 text-lg font-semibold text-white shadow-sm aspect-square">
-                      {resolveAvatarLetter(post.users)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <p className="text-base font-semibold">{post.users?.first_name || 'User'}</p>
-                        <span className="text-sm text-slate-500 dark:text-slate-400">{timeSince(post.created_at)}</span>
-                      </div>
-                      <p className="mt-2 text-base text-slate-700 dark:text-slate-200">{post.content}</p>
-                      <div className="mt-4 flex items-center gap-7 text-base text-slate-500 dark:text-slate-400">
-                        <button className="hover:text-indigo-600 dark:hover:text-indigo-400">Like</button>
-                        <button className="hover:text-indigo-600 dark:hover:text-indigo-400">Comment</button>
-                        <button className="hover:text-indigo-600 dark:hover:text-indigo-400">Share</button>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+            {/* Render content based on active view */}
+            {renderViewContent()}
           </main>
+          
+          
+          {/* Right Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 xl:col-span-2">
             <div className="sticky top-4 ml-auto lg:mr-12 xl:mr-22 w-full max-w-sm space-y-4 pr-4 lg:pr-6 xl:pr-8">
               <form className="relative flex w-full items-center rounded-full border border-slate-200 bg-white pl-4 pr-12 py-2.5 dark:border-slate-700 dark:bg-slate-800 lg:min-w-[260px] xl:min-w-[280px] lg:mt-2 xl:mt-3">
@@ -446,7 +747,7 @@ function DashboardContent({ initialNewsArticles, newsError }) {
                   ))}
                 </ul>
               </div>
-              <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 px-6 py-4 lg:min-w-[260px] xl:min-w-[280px]">
+              <div className="w-full rounded-xl border border-slate-200 bg-white px-6 py-4 dark:border-slate-700 dark:bg-slate-800 lg:min-w-[260px] xl:min-w-[280px]">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-semibold">Latest News</h3>
                   <button
@@ -512,6 +813,116 @@ function DashboardContent({ initialNewsArticles, newsError }) {
         </div>
         {authError && <div className="mt-6 text-red-800 bg-red-100 border border-red-300 rounded p-3 text-base dark:bg-red-900/40 dark:text-red-200 dark:border-red-800/60">{authError}</div>}
       </div>
+
+      {/* Compose Modal */}
+      {showComposeModal && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-20">
+          <div className="w-full max-w-2xl rounded-2xl bg-white dark:bg-slate-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-6 py-4">
+              <button
+                onClick={handleCloseCompose}
+                className="flex items-center gap-2 text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Close
+              </button>
+              <button
+                onClick={handleSaveDraft}
+                className="rounded-full px-4 py-1.5 text-sm text-indigo-600 transition hover:bg-indigo-50 dark:text-indigo-300 dark:hover:bg-indigo-500/10"
+              >
+                Drafts ({drafts.length})
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-500 text-lg font-semibold text-white">
+                  {currentUserAvatarLetter}
+                </div>
+                <textarea
+                  value={postContent}
+                  onChange={(e) => setPostContent(e.target.value)}
+                  placeholder="What's happening?"
+                  rows={4}
+                  className="w-full resize-none bg-transparent text-lg text-slate-700 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+                  autoFocus
+                />
+              </div>
+
+              {postMedia.length > 0 && (
+                <div className="mt-4 grid grid-cols-2 gap-2">
+                  {postMedia.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img src={url} alt={`Upload ${index + 1}`} className="w-full h-40 object-cover rounded-lg" />
+                      <button
+                        onClick={() => handleRemoveMedia(index)}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-black/70 text-white opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <button className="mt-4 flex items-center gap-2 text-base font-medium text-indigo-600 transition hover:text-indigo-500 dark:text-indigo-300 dark:hover:text-indigo-200">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 21s6-4.686 6-10a6 6 0 1 0-12 0c0 5.314 6 10 6 10z" />
+                  <circle cx="12" cy="11" r="2" />
+                </svg>
+                Everyone can reply
+              </button>
+
+              <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={handleMediaUpload}
+                        className="hidden"
+                      />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300">
+                        <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                          <circle cx="8.5" cy="8.5" r="1.5" />
+                          <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                      </div>
+                    </label>
+                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9" />
+                        <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                        <line x1="9" y1="9" x2="9.01" y2="9" />
+                        <line x1="15" y1="9" x2="15.01" y2="9" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-slate-500 dark:text-slate-400">
+                      {postContent.length}/280
+                    </span>
+                    <button
+                      onClick={handlePost}
+                      disabled={!postContent.trim() && postMedia.length === 0}
+                      className="rounded-full bg-indigo-600 px-6 py-2 text-base font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Post
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
