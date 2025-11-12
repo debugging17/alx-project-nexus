@@ -1,31 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 
-const SplashScreen = dynamic(() => import('../components/SplashScreen'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-white">
-      <div className="animate-pulse text-sm uppercase tracking-[0.4em] text-indigo-200">Loading intro…</div>
-    </div>
-  ),
-});
+const AnimatedSplashScreen = dynamic(
+  () => import('../components/AnimatedSplashScreen'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-screen w-screen items-center justify-center bg-slate-950 text-white">
+        <div className="animate-pulse text-sm uppercase tracking-[0.4em] text-indigo-200">
+          Loading intro…
+        </div>
+      </div>
+    ),
+  },
+);
 
 export default function SplashPage() {
   const router = useRouter();
 
-  const redirectToHome = () => {
+  const redirectToHome = useCallback(() => {
     if (typeof window !== 'undefined') {
       window.sessionStorage.setItem('splashShown', 'true');
       window.localStorage.setItem('theme', 'light');
       document.documentElement.classList.remove('dark');
     }
     router.replace('/');
-  };
+  }, [router]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const status = window.sessionStorage.getItem('splashShown');
+    const status = window.sessionStorage.setItem('splashShown', 'pending');
     if (status === 'true') {
       redirectToHome();
     }
@@ -35,5 +40,5 @@ export default function SplashPage() {
     redirectToHome();
   };
 
-  return <SplashScreen onFinished={handleFinish} duration={15000} />;
+  return <AnimatedSplashScreen onFinished={handleFinish} duration={10000} />;
 }

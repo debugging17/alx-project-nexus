@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { gsap } from 'gsap';
+import { useGSAP } from '@gsap/react';
 import SplitText from './SplitText';
 
 const Africa = dynamic(() => import('@react-map/africa'), { ssr: false });
@@ -25,92 +27,128 @@ const MAP_LAYOUT = {
   lg: { topGap: '4.1rem', scale: 2.08 },
 };
 
-export default function SplashScreen({ onFinished, duration = 3800 }) {
-  const [progress, setProgress] = useState(0);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+export default function AnimatedSplashScreen({ onFinished, duration = 5000 }) {
+  const container = useRef(null);
+  const progress = useRef(0);
   const finishedRef = useRef(false);
 
   const segmentCount = 18;
-  const filledSegments = useMemo(
-    () =>
-      Math.min(
-        segmentCount,
-        Math.round(Math.max(0, Math.min(progress, 1)) * segmentCount),
-      ),
-    [progress],
+  const filledSegments = useMemo(() =>
+    Math.min(
+      segmentCount,
+      Math.round(Math.max(0, Math.min(progress.current, 1)) * segmentCount),
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [progress.current],
   );
 
-  useEffect(() => {
-    const startedAt = performance.now();
-    let frameId;
+  useGSAP(
+    () => {
+      const tl = gsap.timeline({
+        onComplete: () => {
+          if (!finishedRef.current) {
+            finishedRef.current = true;
+            onFinished?.();
+          }
+        },
+      });
 
-    const tick = () => {
-      const elapsed = performance.now() - startedAt;
-      const nextProgress = Math.min(1, elapsed / duration);
-      setProgress(nextProgress);
+      tl.fromTo(
+        container.current,
+        { autoAlpha: 0 },
+        { autoAlpha: 1, duration: 0.5, ease: 'power2.inOut' },
+      );
 
-      if (nextProgress >= 1 && !finishedRef.current) {
-        finishedRef.current = true;
-        onFinished?.();
-        return;
-      }
+      tl.fromTo(
+        '.logo',
+        { y: -50, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out' },
+        '+=0.2',
+      );
 
-      frameId = requestAnimationFrame(tick);
-    };
+      tl.fromTo(
+        '.headline .char',
+        { y: 40, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.6,
+          ease: 'power3.out',
+          stagger: 0.03,
+        },
+        '+=0.2',
+      );
 
-    frameId = requestAnimationFrame(tick);
+      tl.fromTo(
+        '.sub-headline',
+        { y: 20, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.6, ease: 'power3.out' },
+        '+=0.2',
+      );
 
-    return () => {
-      if (frameId) cancelAnimationFrame(frameId);
-    };
-  }, [duration, onFinished]);
+      tl.fromTo(
+        '.feature-tag',
+        { y: 20, autoAlpha: 0 },
+        {
+          y: 0,
+          autoAlpha: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          stagger: 0.1,
+        },
+        '+=0.3',
+      );
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+      tl.to(
+        progress,
+        {
+          current: 1,
+          duration: duration / 1000 - tl.duration(),
+          ease: 'linear',
+        },
+        0,
+      );
 
-    const root = document.documentElement;
-    const updateThemeState = () => {
-      const next = root.classList.contains('dark');
-      setIsDarkMode((prev) => (prev === next ? prev : next));
-    };
+      tl.fromTo(
+        '.map-transform-graphic',
+        { scale: 1.5, autoAlpha: 0 },
+        {
+          scale: 1,
+          autoAlpha: 1,
+          duration: 1.5,
+          ease: 'power3.out',
+        },
+        1,
+      );
 
-    updateThemeState();
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-          updateThemeState();
-          break;
-        }
-      }
-    });
-
-    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
-
-    const handleStorage = (event) => {
-      if (event.key === 'theme') {
-        updateThemeState();
-      }
-    };
-
-    window.addEventListener('storage', handleStorage);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('storage', handleStorage);
-    };
-  }, []);
+      tl.fromTo(
+        '.hub-badge',
+        { scale: 0.5, autoAlpha: 0 },
+        {
+          scale: 1,
+          autoAlpha: 1,
+          duration: 0.5,
+          ease: 'power2.out',
+          stagger: 0.1,
+        },
+        1.5,
+      );
+    },
+    { scope: container },
+  );
 
   const handleSkip = () => {
     if (!finishedRef.current) {
       finishedRef.current = true;
-      setProgress(1);
       onFinished?.();
     }
   };
 
   return (
-    <div className="relative flex min-h-screen w-screen items-center justify-start overflow-hidden bg-[#f8fafc] text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div
+      ref={container}
+      className="invisible relative flex min-h-screen w-screen items-center justify-start overflow-hidden bg-[#f8fafc] text-slate-900 dark:bg-slate-950 dark:text-slate-100"
+    >
       <div className="absolute inset-0 bg-gradient-to-br from-white via-sky-50/65 to-indigo-50/55 dark:from-slate-950 dark:via-slate-900/80 dark:to-slate-900/40" aria-hidden />
 
       <div className="relative z-10 grid h-full w-full max-w-[1260px] grid-cols-1 items-stretch gap-8 pl-3 pr-3 py-6 sm:pl-4 sm:pr-4 sm:py-7 md:grid-cols-[1.05fr,1fr] md:gap-10 md:pl-6 md:pr-5 md:py-8 lg:gap-14 lg:pl-8 lg:pr-6">
@@ -118,7 +156,7 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
           <div className="flex flex-col items-center gap-6 text-center md:items-start md:text-left md:pt-1">
             <Link
               href="/"
-              className="relative block w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354BAE]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="logo relative block w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-[#354BAE]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               <span className="sr-only">Go to home</span>
               <img
@@ -130,24 +168,16 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
             </Link>
 
             <div className="max-w-xl space-y-5 text-slate-600 dark:text-slate-300">
-              <p className="text-xs uppercase tracking-[0.55em] text-[#354BAE] md:text-sm dark:text-indigo-300">
+              <p className="sub-headline text-xs uppercase tracking-[0.55em] text-[#354BAE] md:text-sm dark:text-indigo-300">
                 Connecting African Creatives
               </p>
               <SplitText
                 text="Discover. Collaborate. Showcase."
-                className="text-[2.3rem] font-semibold leading-[1.03] text-slate-900 dark:text-slate-100 sm:text-[2.45rem] md:text-[2.8rem] lg:text-[3.1rem] xl:text-[3.3rem]"
-                delay={110}
-                duration={0.6}
-                ease="power3.out"
+                className="headline text-[2.3rem] font-semibold leading-[1.03] text-slate-900 dark:text-slate-100 sm:text-[2.45rem] md:text-[2.8rem] lg:text-[3.1rem] xl:text-[3.3rem]"
                 splitType="chars"
-                from={{ opacity: 0, y: 40 }}
-                to={{ opacity: 1, y: 0 }}
-                threshold={0.15}
-                rootMargin="-80px"
-                textAlign="left"
                 tag="h2"
               />
-              <p className="text-sm leading-relaxed text-slate-600 md:text-[0.95rem] lg:text-[1.02rem] dark:text-slate-300">
+              <p className="sub-headline text-sm leading-relaxed text-slate-600 md:text-[0.95rem] lg:text-[1.02rem] dark:text-slate-300">
                 From Lagos to Nairobi, Accra to Cape Town—immerse yourself in a vibrant network of artists, designers, musicians, filmmakers, and storytellers shaping culture across the continent.
               </p>
             </div>
@@ -174,16 +204,16 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
               </div>
             </div>
             <span className="text-[0.62rem] uppercase tracking-[0.34em] text-[#354BAE] md:text-[0.7rem] dark:text-indigo-300">
-              Preparing your nexus • {Math.round(Math.min(1, Math.max(0, progress)) * 100)}%
+              Preparing your nexus • {Math.round(Math.min(1, Math.max(0, progress.current)) * 100)}%
             </span>
             <div className="flex w-full flex-wrap justify-center gap-2 text-[0.72rem] text-slate-500 dark:text-slate-300 md:justify-start md:gap-2.5 md:text-[0.82rem]">
-              <span className="rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
+              <span className="feature-tag rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
                 Live showcases
               </span>
-              <span className="rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
+              <span className="feature-tag rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
                 Creator collabs
               </span>
-              <span className="rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
+              <span className="feature-tag rounded-full border border-[#354BAE]/30 bg-white/90 px-3.5 py-1.5 text-[#354BAE] shadow-[0_6px_18px_rgba(53,75,174,0.12)] md:px-4 md:py-1.5 dark:border-indigo-400/30 dark:bg-slate-900/75 dark:text-indigo-200">
                 Marketplace
               </span>
             </div>
@@ -207,20 +237,16 @@ export default function SplashScreen({ onFinished, duration = 3800 }) {
                     type="select-multiple"
                     disableClick
                     disableHover
-                    mapColor={isDarkMode ? 'rgba(99, 102, 241, 0.32)' : 'rgba(53, 75, 174, 0.18)'}
-                    strokeColor={isDarkMode ? '#a5b4fc' : '#2f3c8d'}
+                    mapColor={'rgba(53, 75, 174, 0.18)'}
+                    strokeColor={'#2f3c8d'}
                     strokeWidth={1.1}
-                    className={`map-transform-graphic h-full w-auto transform-gpu mix-blend-multiply ${
-                      isDarkMode
-                        ? 'drop-shadow-[0_28px_88px_rgba(79,70,229,0.35)]'
-                        : 'drop-shadow-[0_32px_96px_rgba(53,75,174,0.22)]'
-                    }`}
+                    className={`map-transform-graphic h-full w-auto transform-gpu mix-blend-multiply drop-shadow-[0_32px_96px_rgba(53,75,174,0.22)]`}
                   />
                   {hubBadges.map((badge) => (
                     <span
                       key={badge.label}
                       style={{ top: badge.top, left: badge.left }}
-                      className="pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#354BAE]/30 bg-white/90 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#354BAE] shadow-[0_6px_16px_rgba(53,75,174,0.18)] dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-indigo-200 dark:shadow-[0_8px_24px_rgba(79,70,229,0.35)]"
+                      className="hub-badge pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#354BAE]/30 bg-white/90 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-[#354BAE] shadow-[0_6px_16px_rgba(53,75,174,0.18)] dark:border-indigo-400/30 dark:bg-slate-900/80 dark:text-indigo-200 dark:shadow-[0_8px_24px_rgba(79,70,229,0.35)]"
                     >
                       {badge.label}
                     </span>
