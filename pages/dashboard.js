@@ -42,7 +42,9 @@ function DashboardContent({ initialNewsArticles, newsError }) {
   const { data: postsData, loading: postsLoading, error: postsError } = useQuery(GET_POSTS);
   const { data: usersData, loading: usersLoading, error: usersError } = useQuery(GET_USERS);
 
-  const posts = postsData?.postsCollection?.edges.map(e => e.node) || [];
+  const fetchedPosts = postsData?.postsCollection?.edges.map(e => e.node) || [];
+  const [localPosts, setLocalPosts] = useState([]);
+  const posts = [...localPosts, ...fetchedPosts];
   const suggestedUsers = usersData?.usersCollection?.edges.map(e => e.node) || [];
   const [newsArticles, setNewsArticles] = useState(() => initialNewsArticles);
   const [newsLoading, setNewsLoading] = useState(false);
@@ -62,6 +64,9 @@ function DashboardContent({ initialNewsArticles, newsError }) {
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [bookmarkedPosts, setBookmarkedPosts] = useState(new Set());
   const [commentingOn, setCommentingOn] = useState(null);
+  
+  // Image lightbox state
+  const [lightboxImage, setLightboxImage] = useState(null);
 
 
   const resolveAvatarLetter = (entity) => {
@@ -202,10 +207,29 @@ function DashboardContent({ initialNewsArticles, newsError }) {
   const handlePost = async () => {
     if (!postContent.trim() && postMedia.length === 0) return;
     
-    // Post creation will be implemented with GraphQL mutation
-    // For now, showing success message
+    // Create new post object
+    const newPost = {
+      id: `local-${Date.now()}`,
+      content: postContent,
+      media: postMedia.length > 0 ? postMedia : null,
+      created_at: new Date().toISOString(),
+      user_id: user?.id,
+      author: {
+        id: user?.id,
+        email: user?.email,
+        first_name: user?.user_metadata?.first_name || null,
+        last_name: user?.user_metadata?.last_name || null,
+        avatar_letter: user?.user_metadata?.first_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()
+      }
+    };
+    
+    // Add to local posts (will appear at top of feed)
+    setLocalPosts(prev => [newPost, ...prev]);
+    
+    // Show success message
     alert('Post created successfully!');
     
+    // Clear form and close modal
     setPostContent('');
     setPostMedia([]);
     setShowComposeModal(false);
@@ -299,14 +323,29 @@ function DashboardContent({ initialNewsArticles, newsError }) {
                 <article key={post.id} className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-4">
                   <div className="flex gap-4">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-500 text-lg font-semibold text-white shadow-sm aspect-square">
-                      {resolveAvatarLetter(post.users)}
+                      {resolveAvatarLetter(post.users || post.author)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <p className="text-base font-semibold">{post.users?.first_name || 'User'}</p>
+                        <p className="text-base font-semibold">{post.users?.first_name || post.author?.first_name || 'User'}</p>
                         <span className="text-sm text-slate-500 dark:text-slate-400">{timeSince(post.created_at)}</span>
                       </div>
                       <p className="mt-2 text-base text-slate-700 dark:text-slate-200">{post.content}</p>
+                      {post.media && post.media.length > 0 && (
+                        <div className={`mt-3 gap-2 ${post.media.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2'}`}>
+                          {post.media.map((url, idx) => (
+                            <img 
+                              key={idx} 
+                              src={url} 
+                              alt={`Post media ${idx + 1}`} 
+                              className={`w-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition ${
+                                post.media.length === 1 ? 'h-96 max-h-[500px]' : 'h-64'
+                              }`}
+                              onClick={() => setLightboxImage(url)}
+                            />
+                          ))}
+                        </div>
+                      )}
                       <div className="mt-4 flex items-center gap-7 text-base text-slate-500 dark:text-slate-400">
                         <button 
                           onClick={() => handleLike(post.id)}
@@ -480,7 +519,76 @@ function DashboardContent({ initialNewsArticles, newsError }) {
             </div>
             <div className="rounded-xl border border-slate-200 bg-white dark:bg-slate-800 dark:border-slate-700 p-6">
               <h3 className="font-bold text-lg mb-4">Your Posts</h3>
-              <p className="text-slate-600 dark:text-slate-400">Your posts will appear here</p>
+              {posts.filter(post => post.user_id === user?.id || post.author?.id === user?.id).length === 0 ? (
+                <p className="text-slate-600 dark:text-slate-400">You haven&apos;t posted anything yet</p>
+              ) : (
+                <div className="space-y-4">
+                  {posts.filter(post => post.user_id === user?.id || post.author?.id === user?.id).map(post => (
+                    <article key={post.id} className="border-b border-slate-200 dark:border-slate-700 pb-4 last:border-0">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-sm font-semibold text-white">
+                          {currentUserAvatarLetter}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-slate-900 dark:text-slate-100">
+                              {user?.user_metadata?.first_name || user?.email?.split('@')[0]}
+                            </span>
+                            <span className="text-slate-500 dark:text-slate-400 text-sm">
+                              · {timeSince(post.created_at)}
+                            </span>
+                          </div>
+                          <p className="mt-1 text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{post.content}</p>
+                          {post.media && post.media.length > 0 && (
+                            <div className={`mt-3 gap-2 ${post.media.length === 1 ? 'grid grid-cols-1' : 'grid grid-cols-2'}`}>
+                              {post.media.map((url, idx) => (
+                                <img 
+                                  key={idx} 
+                                  src={url} 
+                                  alt={`Post media ${idx + 1}`} 
+                                  className={`w-full object-cover rounded-lg cursor-pointer hover:opacity-90 transition ${
+                                    post.media.length === 1 ? 'h-96 max-h-[500px]' : 'h-48'
+                                  }`}
+                                  onClick={() => setLightboxImage(url)}
+                                />
+                              ))}
+                            </div>
+                          )}
+                          <div className="mt-3 flex items-center gap-6 text-slate-600 dark:text-slate-400">
+                            <button
+                              onClick={() => handleLike(post.id)}
+                              className={`flex items-center gap-2 transition ${likedPosts.has(post.id) ? 'text-red-500' : 'hover:text-red-500'}`}
+                            >
+                              <svg className="h-5 w-5" fill={likedPosts.has(post.id) ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                              </svg>
+                              <span className="text-sm">Like</span>
+                            </button>
+                            <button
+                              onClick={() => handleComment(post.id)}
+                              className="flex items-center gap-2 hover:text-indigo-500 transition"
+                            >
+                              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                              <span className="text-sm">Comment</span>
+                            </button>
+                            <button
+                              onClick={() => handleShare(post)}
+                              className="flex items-center gap-2 hover:text-green-500 transition"
+                            >
+                              <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                              </svg>
+                              <span className="text-sm">Share</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -880,7 +988,8 @@ function DashboardContent({ initialNewsArticles, newsError }) {
               <div className="mt-5 border-t border-slate-200 pt-4 dark:border-slate-700">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <label className="cursor-pointer">
+                    {/* Media Upload */}
+                    <label className="cursor-pointer" title="Add media">
                       <input
                         type="file"
                         accept="image/*,video/*"
@@ -896,7 +1005,41 @@ function DashboardContent({ initialNewsArticles, newsError }) {
                         </svg>
                       </div>
                     </label>
-                    <button className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300">
+                    
+                    {/* GIF */}
+                    <button 
+                      onClick={() => alert('GIF picker coming soon!')}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
+                      title="Add GIF"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M4 8h4a2 2 0 0 1 0 4H5v2" />
+                        <path d="M12 8v8" />
+                        <path d="M16 8h5" />
+                        <path d="M19 8v8" />
+                        <path d="M16 12h3" />
+                      </svg>
+                    </button>
+                    
+                    {/* Poll */}
+                    <button 
+                      onClick={() => alert('Poll feature coming soon!')}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
+                      title="Create poll"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <line x1="6" y1="19" x2="6" y2="10" />
+                        <line x1="12" y1="19" x2="12" y2="5" />
+                        <line x1="18" y1="19" x2="18" y2="13" />
+                      </svg>
+                    </button>
+                    
+                    {/* Emoji */}
+                    <button 
+                      onClick={() => alert('Emoji picker coming soon!')}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
+                      title="Add emoji"
+                    >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="9" />
                         <path d="M8 14s1.5 2 4 2 4-2 4-2" />
@@ -904,15 +1047,49 @@ function DashboardContent({ initialNewsArticles, newsError }) {
                         <line x1="15" y1="9" x2="15.01" y2="9" />
                       </svg>
                     </button>
+                    
+                    {/* Schedule/Calendar */}
+                    <button 
+                      onClick={() => alert('Schedule post coming soon!')}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
+                      title="Schedule post"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                        <line x1="16" y1="2" x2="16" y2="6" />
+                        <line x1="8" y1="2" x2="8" y2="6" />
+                        <line x1="3" y1="10" x2="21" y2="10" />
+                      </svg>
+                    </button>
+                    
+                    {/* Location */}
+                    <button 
+                      onClick={() => alert('Add location coming soon!')}
+                      className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 transition hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-300"
+                      title="Add location"
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path d="M12 21s6-4.686 6-10a6 6 0 1 0-12 0c0 5.314 6 10 6 10z" />
+                        <circle cx="12" cy="11" r="2" />
+                      </svg>
+                    </button>
                   </div>
+                  
                   <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-500 dark:text-slate-400">
                       {postContent.length}/280
                     </span>
                     <button
+                      onClick={handleSaveDraft}
+                      disabled={!postContent.trim() && postMedia.length === 0}
+                      className="rounded-full px-5 py-2 text-base font-medium text-indigo-600 ring-1 ring-inset ring-indigo-200 transition hover:bg-indigo-50 disabled:opacity-50 disabled:cursor-not-allowed dark:text-indigo-200 dark:ring-indigo-500/40 dark:hover:bg-indigo-500/10"
+                    >
+                      Draft
+                    </button>
+                    <button
                       onClick={handlePost}
                       disabled={!postContent.trim() && postMedia.length === 0}
-                      className="rounded-full bg-indigo-600 px-6 py-2 text-base font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="rounded-full bg-indigo-600 px-6 py-2 text-base font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-indigo-500 dark:hover:bg-indigo-400"
                     >
                       Post
                     </button>
@@ -921,6 +1098,30 @@ function DashboardContent({ initialNewsArticles, newsError }) {
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Image Lightbox Modal */}
+      {lightboxImage && (
+        <div 
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            onClick={() => setLightboxImage(null)}
+            className="absolute top-4 right-4 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition"
+            aria-label="Close lightbox"
+          >
+            <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <img 
+            src={lightboxImage} 
+            alt="Expanded view" 
+            className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
         </div>
       )}
     </div>
