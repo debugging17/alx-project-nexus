@@ -17,7 +17,6 @@ export default function Home() {
     if (typeof window === 'undefined') return;
     const status = window.sessionStorage.getItem('splashShown');
     if (status !== 'true') {
-      window.sessionStorage.setItem('splashShown', 'pending');
       router.replace('/splash');
       return;
     }
@@ -83,9 +82,21 @@ export default function Home() {
         >
           <span className="sr-only">Go to home</span>
           {/* Light mode logo */}
-          <img src="/img/logo.svg" alt="App logo" className="h-20 md:h-24 w-auto object-contain drop-shadow-md block dark:hidden" />
+          <img 
+            src="/img/logo.svg" 
+            alt="Abɔnten" 
+            className="h-20 md:h-24 w-auto object-contain drop-shadow-md block dark:hidden" 
+            loading="eager"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
           {/* Dark mode logo */}
-          <img src="/img/darkmodelogo.svg" alt="App logo dark" className="h-16 md:h-20 w-auto object-contain drop-shadow-md hidden dark:block" />
+          <img 
+            src="/img/darkmodelogo.svg" 
+            alt="Abɔnten" 
+            className="h-16 md:h-20 w-auto object-contain drop-shadow-md hidden dark:block" 
+            loading="eager"
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
         </Link>
       </div>
 
@@ -134,13 +145,13 @@ export default function Home() {
             >
               <div>
                 <label htmlFor="email" className="block text-sm text-white/90 mb-1">Email</label>
-                <input id="email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} required placeholder="you@example.com" className="w-full rounded-lg px-4 py-3 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400" />
+                <input id="email" type="email" value={email} onChange={(e)=>setEmail(e.target.value)} required placeholder="you@example.com" className="w-full rounded-lg px-4 py-3 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400" style={{WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.9) inset', boxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.9) inset'}} />
               </div>
 
               <div>
                 <label htmlFor="password" className="block text-sm text-white/90 mb-1">Password</label>
                 <div className="relative">
-                  <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e)=>setPassword(e.target.value)} required placeholder="••••••••" className="w-full rounded-lg px-4 py-3 pr-12 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400" />
+                  <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e)=>setPassword(e.target.value)} required placeholder="••••••••" className="w-full rounded-lg px-4 py-3 pr-12 bg-white/90 focus:bg-white outline-none ring-2 ring-transparent focus:ring-white/60 placeholder:text-gray-500 text-slate-900 dark:text-slate-100 dark:bg-slate-800/80 dark:focus:bg-slate-800 dark:placeholder:text-slate-400" style={{WebkitBoxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.9) inset', boxShadow: '0 0 0 1000px rgba(255, 255, 255, 0.9) inset'}} />
                   <button type="button" onClick={()=>setShowPassword(!showPassword)} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-700 hover:text-gray-900 px-2 py-1 rounded-md" aria-label={showPassword ? 'Hide password' : 'Show password'}>
                     {showPassword ? 'Hide' : 'Show'}
                   </button>

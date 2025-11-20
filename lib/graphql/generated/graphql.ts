@@ -464,14 +464,17 @@ export type PostsUpdateResponse = {
 
 export type Users = Node & {
   __typename?: 'users';
+  avatar_letter?: Maybe<Scalars['String']['output']>;
+  avatar_url?: Maybe<Scalars['String']['output']>;
   created_at?: Maybe<Scalars['Datetime']['output']>;
+  display_name?: Maybe<Scalars['String']['output']>;
   email?: Maybe<Scalars['String']['output']>;
-  avatar?: Maybe<Scalars['String']['output']>;
   first_name?: Maybe<Scalars['String']['output']>;
   id: Scalars['UUID']['output'];
   last_name?: Maybe<Scalars['String']['output']>;
   /** Globally Unique Record Identifier */
   nodeId: Scalars['ID']['output'];
+  phone?: Maybe<Scalars['String']['output']>;
   postsCollection?: Maybe<PostsConnection>;
 };
 
@@ -509,7 +512,10 @@ export type UsersEdge = {
 export type UsersFilter = {
   /** Returns true only if all its inner filters are true, otherwise returns false */
   and?: InputMaybe<Array<UsersFilter>>;
+  avatar_letter?: InputMaybe<StringFilter>;
+  avatar_url?: InputMaybe<StringFilter>;
   created_at?: InputMaybe<DatetimeFilter>;
+  display_name?: InputMaybe<StringFilter>;
   email?: InputMaybe<StringFilter>;
   first_name?: InputMaybe<StringFilter>;
   id?: InputMaybe<UuidFilter>;
@@ -519,15 +525,19 @@ export type UsersFilter = {
   not?: InputMaybe<UsersFilter>;
   /** Returns true if at least one of its inner filters is true, otherwise returns false */
   or?: InputMaybe<Array<UsersFilter>>;
+  phone?: InputMaybe<StringFilter>;
 };
 
 export type UsersInsertInput = {
+  avatar_letter?: InputMaybe<Scalars['String']['input']>;
+  avatar_url?: InputMaybe<Scalars['String']['input']>;
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  display_name?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
   first_name?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   last_name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UsersInsertResponse = {
@@ -539,21 +549,27 @@ export type UsersInsertResponse = {
 };
 
 export type UsersOrderBy = {
+  avatar_letter?: InputMaybe<OrderByDirection>;
+  avatar_url?: InputMaybe<OrderByDirection>;
   created_at?: InputMaybe<OrderByDirection>;
+  display_name?: InputMaybe<OrderByDirection>;
   email?: InputMaybe<OrderByDirection>;
-  avatar?: InputMaybe<OrderByDirection>;
   first_name?: InputMaybe<OrderByDirection>;
   id?: InputMaybe<OrderByDirection>;
   last_name?: InputMaybe<OrderByDirection>;
+  phone?: InputMaybe<OrderByDirection>;
 };
 
 export type UsersUpdateInput = {
+  avatar_letter?: InputMaybe<Scalars['String']['input']>;
+  avatar_url?: InputMaybe<Scalars['String']['input']>;
   created_at?: InputMaybe<Scalars['Datetime']['input']>;
+  display_name?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
   first_name?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['UUID']['input']>;
   last_name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UsersUpdateResponse = {
@@ -563,6 +579,14 @@ export type UsersUpdateResponse = {
   /** Array of records impacted by the mutation */
   records: Array<Users>;
 };
+
+export type CreatePostMutationVariables = Exact<{
+  content: Scalars['String']['input'];
+  user_id: Scalars['UUID']['input'];
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', insertIntopostsCollection?: { __typename?: 'postsInsertResponse', affectedCount: number, records: Array<{ __typename?: 'posts', id: any, content?: string | null, created_at?: any | null, user_id?: any | null, users?: { __typename?: 'users', id: any, first_name?: string | null, last_name?: string | null, email?: string | null } | null }> } | null };
 
 export type GetPostsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -575,5 +599,6 @@ export type GetUsersQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetUsersQuery = { __typename?: 'Query', usersCollection?: { __typename?: 'usersConnection', edges: Array<{ __typename?: 'usersEdge', node: { __typename?: 'users', id: any, first_name?: string | null, last_name?: string | null, email?: string | null } }> } | null };
 
 
+export const CreatePostDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePost"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"content"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"user_id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"insertIntopostsCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"objects"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"content"},"value":{"kind":"Variable","name":{"kind":"Name","value":"content"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"user_id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"user_id"}}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"affectedCount"}},{"kind":"Field","name":{"kind":"Name","value":"records"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}},{"kind":"Field","name":{"kind":"Name","value":"user_id"}},{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"first_name"}},{"kind":"Field","name":{"kind":"Name","value":"last_name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreatePostMutation, CreatePostMutationVariables>;
 export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPosts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"postsCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"created_at"},"value":{"kind":"EnumValue","value":"DescNullsLast"}}]}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"created_at"}},{"kind":"Field","name":{"kind":"Name","value":"user_id"}},{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"first_name"}},{"kind":"Field","name":{"kind":"Name","value":"last_name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
 export const GetUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"usersCollection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"first_name"}},{"kind":"Field","name":{"kind":"Name","value":"last_name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUsersQuery, GetUsersQueryVariables>;

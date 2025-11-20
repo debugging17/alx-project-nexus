@@ -30,7 +30,7 @@ export default function SplashPage() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const status = window.sessionStorage.setItem('splashShown', 'pending');
+    const status = window.sessionStorage.getItem('splashShown');
     if (status === 'true') {
       redirectToHome();
     }
@@ -40,5 +40,5 @@ export default function SplashPage() {
     redirectToHome();
   };
 
-  return <AnimatedSplashScreen onFinished={handleFinish} duration={10000} />;
+  return <AnimatedSplashScreen onFinished={handleFinish} duration={15000} />;
 }

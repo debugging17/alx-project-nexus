@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Fix Firefox autofill yellow background */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.9) inset !important;
+  box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.9) inset !important;
+  -webkit-text-fill-color: #0f172a !important;
+}
+
+/* Firefox specific autofill styling */
+input:-moz-autofill,
+input:-moz-autofill-preview {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  color: #0f172a !important;
+}
+
+/* Dark mode autofill */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(30, 41, 59, 0.8) inset !important;
+  box-shadow: 0 0 0 1000px rgba(30, 41, 59, 0.8) inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+.dark input:-moz-autofill,
+.dark input:-moz-autofill-preview {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+  color: #f1f5f9 !important;
+}

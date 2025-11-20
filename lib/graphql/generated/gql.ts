@@ -14,10 +14,12 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  mutation CreatePost($content: String!, $user_id: UUID!) {\n    insertIntopostsCollection(objects: [{ content: $content, user_id: $user_id }]) {\n      affectedCount\n      records {\n        id\n        content\n        created_at\n        user_id\n        users {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n": typeof types.CreatePostDocument,
     "\n  query GetPosts {\n    postsCollection(orderBy: { created_at: DescNullsLast }, first: 20) {\n      edges {\n        node {\n          id\n          content\n          created_at\n          user_id\n          users {\n            id\n            first_name\n            last_name\n            email\n          }\n        }\n      }\n    }\n  }\n": typeof types.GetPostsDocument,
     "\n  query GetUsers {\n    usersCollection(first: 5) {\n      edges {\n        node {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n": typeof types.GetUsersDocument,
 };
 const documents: Documents = {
+    "\n  mutation CreatePost($content: String!, $user_id: UUID!) {\n    insertIntopostsCollection(objects: [{ content: $content, user_id: $user_id }]) {\n      affectedCount\n      records {\n        id\n        content\n        created_at\n        user_id\n        users {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n": types.CreatePostDocument,
     "\n  query GetPosts {\n    postsCollection(orderBy: { created_at: DescNullsLast }, first: 20) {\n      edges {\n        node {\n          id\n          content\n          created_at\n          user_id\n          users {\n            id\n            first_name\n            last_name\n            email\n          }\n        }\n      }\n    }\n  }\n": types.GetPostsDocument,
     "\n  query GetUsers {\n    usersCollection(first: 5) {\n      edges {\n        node {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n": types.GetUsersDocument,
 };
@@ -36,6 +38,10 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  mutation CreatePost($content: String!, $user_id: UUID!) {\n    insertIntopostsCollection(objects: [{ content: $content, user_id: $user_id }]) {\n      affectedCount\n      records {\n        id\n        content\n        created_at\n        user_id\n        users {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CreatePost($content: String!, $user_id: UUID!) {\n    insertIntopostsCollection(objects: [{ content: $content, user_id: $user_id }]) {\n      affectedCount\n      records {\n        id\n        content\n        created_at\n        user_id\n        users {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
