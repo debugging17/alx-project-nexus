@@ -29,8 +29,10 @@ const MAP_LAYOUT = {
 
 export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
   const container = useRef(null);
+  const mapContainer = useRef(null);
   const progress = useRef(0);
   const finishedRef = useRef(false);
+  const [activeCity, setActiveCity] = useState(null);
 
   const segmentCount = 18;
   const filledSegments = useMemo(() =>
@@ -42,11 +44,12 @@ export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
     [progress.current],
   );
 
-  useGSAP(
+  const { contextSafe } = useGSAP(
     () => {
       const tl = gsap.timeline({
         onComplete: () => {
-          if (!finishedRef.current) {
+          // Only auto-finish if no city is selected to avoid interrupting interaction
+          if (!finishedRef.current && !activeCity) {
             finishedRef.current = true;
             onFinished?.();
           }
@@ -149,6 +152,52 @@ export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
     }
   };
 
+  const handleCityClick = contextSafe((city) => {
+    setActiveCity(city);
+    const scale = 3.5;
+    const xPercent = (50 - parseFloat(city.left)) * scale;
+    const yPercent = (50 - parseFloat(city.top)) * scale;
+
+    gsap.to(mapContainer.current, {
+      scale: scale,
+      xPercent: xPercent,
+      yPercent: yPercent,
+      duration: 1.5,
+      ease: 'power4.inOut',
+    });
+
+    // Fade out other badges
+    gsap.to('.hub-badge', {
+      autoAlpha: 0,
+      scale: 0,
+      duration: 0.5,
+      overwrite: true,
+    });
+
+    // Show only active badge (custom logic or just keep it hidden and show a detail card?)
+    // Let's keep the active one visible but scaled down inversely? 
+    // Or simpler: hide all badges and show a "Welcome to [City]" overlay.
+  });
+
+  const handleBackToMap = contextSafe(() => {
+    setActiveCity(null);
+    gsap.to(mapContainer.current, {
+      scale: 1,
+      xPercent: 0,
+      yPercent: 0,
+      duration: 1.2,
+      ease: 'power4.inOut',
+    });
+
+    gsap.to('.hub-badge', {
+      autoAlpha: 1,
+      scale: 1,
+      duration: 0.5,
+      delay: 0.5,
+      stagger: 0.05,
+    });
+  });
+
   return (
     <div
       ref={container}
@@ -162,7 +211,7 @@ export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
       <div className="absolute inset-0 bg-[url('/img/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" style={{ opacity: 0.1 }} />
 
       <div className="relative z-10 grid h-full w-full max-w-[1260px] grid-cols-1 items-stretch gap-8 pl-3 pr-3 py-6 sm:pl-4 sm:pr-4 sm:py-7 md:grid-cols-[1.05fr,1fr] md:gap-10 md:pl-6 md:pr-5 md:py-8 lg:gap-14 lg:pl-8 lg:pr-6">
-        <div className="flex h-full w-full flex-col justify-between text-center md:max-w-[500px] md:text-left">
+        <div className={`flex h-full w-full flex-col justify-between text-center md:max-w-[500px] md:text-left transition-opacity duration-500 ${activeCity ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
           <div className="flex flex-col items-center gap-8 text-center md:items-start md:text-left md:pt-1">
             <Link
               href="/"
@@ -234,12 +283,40 @@ export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
           </div>
         </div>
 
+        {/* Detail View Overlay */}
+        <div className={`absolute inset-0 z-20 flex flex-col items-start justify-center p-8 transition-all duration-500 ${activeCity ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
+          {activeCity && (
+            <div className="max-w-md space-y-6">
+              <button
+                onClick={handleBackToMap}
+                className="flex items-center gap-2 text-sm font-medium text-indigo-300 hover:text-white transition"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                Back to map
+              </button>
+              <h2 className="text-6xl font-bold text-white">{activeCity.label}</h2>
+              <p className="text-xl text-slate-300">
+                A thriving hub of creativity and innovation. Explore the local scene, connect with top talent, and discover unique opportunities in {activeCity.label}.
+              </p>
+              <button
+                onClick={handleSkip}
+                className="px-8 py-3 rounded-full bg-indigo-600 text-white font-semibold hover:bg-indigo-500 transition"
+              >
+                Explore {activeCity.label}
+              </button>
+            </div>
+          )}
+        </div>
+
         <div className="flex h-full w-full items-start justify-center">
           <div className="relative flex h-full w-full max-w-[760px] flex-col px-1.5 pb-0 pt-0 sm:px-2 md:px-0 md:pt-0">
             <div className="map-transform-wrapper relative flex h-full w-full flex-col rounded-[44px]">
               <div className="map-transform-spacer flex-none" aria-hidden />
               <div className="map-transform-inner relative flex-1">
-                <div className="map-transform-canvas pointer-events-none absolute inset-0 flex items-end justify-center overflow-visible">
+                <div
+                  ref={mapContainer}
+                  className="map-transform-canvas absolute inset-0 flex items-end justify-center overflow-visible"
+                >
                   <Africa
                     type="select-multiple"
                     disableClick
@@ -250,14 +327,15 @@ export default function AnimatedSplashScreen({ onFinished, duration = 15000 }) {
                     className={`map-transform-graphic h-full w-auto transform-gpu drop-shadow-[0_0_30px_rgba(99,102,241,0.3)]`}
                   />
                   {hubBadges.map((badge) => (
-                    <span
+                    <button
                       key={badge.label}
+                      onClick={() => handleCityClick(badge)}
                       style={{ top: badge.top, left: badge.left }}
-                      className="hub-badge pointer-events-none absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-400/30 bg-indigo-950/80 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-widest text-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.4)] backdrop-blur-md"
+                      className="hub-badge absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-indigo-400/30 bg-indigo-950/80 px-3 py-1 text-[0.6rem] font-bold uppercase tracking-widest text-indigo-200 shadow-[0_0_15px_rgba(99,102,241,0.4)] backdrop-blur-md transition hover:scale-110 hover:bg-indigo-900 hover:text-white cursor-pointer z-10"
                     >
                       <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
                       {badge.label}
-                    </span>
+                    </button>
                   ))}
                 </div>
               </div>
